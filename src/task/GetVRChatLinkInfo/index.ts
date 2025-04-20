@@ -59,7 +59,7 @@ export class GetVRChatLinkInfo extends Task {
             // let completedPos = completedRow;
             for (let i = completedRow + 1; i < rows; i++) {
                 const range = sourceSheet;
-                const pixivUserId = sourceSheet.getCell(i, 1).stringValue;
+                const pixivUserId = sourceSheet.getCell(i, 1).valueType	== "numberValue" ? sourceSheet.getCell(i, 1).numberValue.toString() : sourceSheet.getCell(i, 1).stringValue;
                 const vrchatUserId = sourceSheet.getCell(i, 2).stringValue;
                 this.logger.info("Entry found: " + i + " vrchatUserId: " + vrchatUserId + " pixivUserId: " + pixivUserId);
                 const user = await this.repo.getUserInfoByPixivId(pixivUserId);
