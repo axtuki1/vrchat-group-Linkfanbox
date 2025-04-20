@@ -85,7 +85,7 @@ export class CheckApplyUserTask extends Task {
                     }
                     this.logger.info("Apply Role: " + userId + " groupId: " + groupId + " applyList: " + JSON.stringify(applyList));
                     await this.groupRoleApplyTask.AddQueue(
-                        userId,
+                        user,
                         groupId,
                         applyList
                     )

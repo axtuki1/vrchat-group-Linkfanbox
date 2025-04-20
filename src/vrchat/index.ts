@@ -203,6 +203,30 @@ export class VRChat {
 
     //#endregion Auth
 
+    //#region User Management
+
+    public async GetUserInfo(userId: string) {
+        try {
+            this.logger.debug("getting user info");
+            const url = "https://api.vrchat.cloud/api/1/users/<userId>".replace("<userId>", userId);
+            const response = await fetch(url, {
+                method: "GET",
+                headers: this.GetRequestHeader()
+            });
+
+            if (response.status === 200) {
+                return response.json();
+            }
+
+            throw new Error("get failed: [" + response.status + " " + response.statusText + "] " + JSON.stringify(await response.json()));
+
+        } catch (e) {
+            throw e;
+        }
+    }
+
+    //#endregion User Management
+
     //#region Group Management
 
     public async GetGroupMember(groupid: string, userId: string) {

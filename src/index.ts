@@ -66,6 +66,11 @@ const Main = async () => {
 
     Logger.level = config.logLevel || "info";
     let logger = new Logger("Main");
+
+    logger.info("-------");
+    logger.info("");
+    logger.info("starting " + package_json.name + " v" + package_json.version);
+
     let discord = new Discord(config.noticeService.discord.webhookUrl);
     let fanbox = new FANBOX(
         config.authentication.fanbox.cookies,
