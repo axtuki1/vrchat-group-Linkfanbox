@@ -1,0 +1,87 @@
+{
+    // APIにアクセスするためのKey。(基本触らない)
+    "apiKey": "JlE5Jldo5Jibnk5O5hTx6XVqsJu4WJ26",
+    // 各アカウント情報
+    "authentication": {
+        "vrchat": {
+            "email": "",
+            "password": "",
+            "OTP": {
+                // otpauth://totp/... で始まるVRChat設定ページで発行されるQRコードの値。
+                "URI": ""
+            }
+        },
+        "fanbox": {
+            // ログインしたブラウザのUser-Agent
+            "userAgent": "Mozilla....",
+            // FANBOXのセッション情報
+            // ※ブラウザで再ログイン等をした場合は書き換え
+            // 何がなのか全く不明なのでとりあえず全部乗せた
+            "cookies": {
+                "FANBOXSESSID": "",
+                "cf_clearance": "",
+                "p_ab_d_id": "",
+                "p_ab_id_2": "",
+                "p_ab_id": "",
+                "privacy_policy_agreement": "",
+                "privacy_policy_notification": "",
+                "agreement_master_terms_of_use_202408": ""
+            }
+        }
+    },
+    "settings": {
+        "spreadsheet": {
+            // 次回取得までの時間(分)
+            "coolTime": 1440,
+            // Google SpreadsheetのID
+            "spreadsheetId": ""
+        },
+        "vrchat": {
+            // 次回取得までの時間(分)
+            "coolTime": 1440,
+            "groups": [
+                "<groupId>"
+            ]
+        },
+        "fanbox": {
+            // 次回取得までの時間(分)
+            "coolTime": 1440,
+            "plans": {
+                // お気持ち
+                "<planId>": {
+                    "<groupId>": [
+                        "<roleId>"
+                    ]
+                }
+            }
+        }
+    },
+    "database": {
+        "use": "mysql",
+        // "dynamoDB": {
+        //     "tableName": "",
+        //     "region": "",
+        //     "local": true,
+        //     "indexName": {
+        //         "pixivId": "",
+        //         "vrchatId": ""
+        //     }
+        // },
+        "mysql": {
+            "host": "localhost",
+            "port": 3306,
+            "user": "",
+            "password": "",
+            "database": ""
+        }
+    },
+    "noticeService": {
+        "discord": {
+            "webhookUrl": ""
+        }
+    },
+    "OTPValue": "",
+    // 連絡先
+    "contact": "",
+    "logLevel": "info"
+}
