@@ -31,6 +31,8 @@
     },
     "settings": {
         "spreadsheet": {
+            // 処理完了位置を示すセル
+            "completedRowCountCell": "I1",
             // 次回取得までの時間(分)
             "coolTime": 1440,
             // Google SpreadsheetのID

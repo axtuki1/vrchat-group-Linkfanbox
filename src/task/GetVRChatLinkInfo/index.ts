@@ -53,7 +53,7 @@ export class GetVRChatLinkInfo extends Task {
             if (rows < 2) {
                 return;
             }
-            await sourceSheet.loadCells('H1');
+            await sourceSheet.loadCells(config.settings.spreadsheet.completedRowCountCell);
             const completedRow = sourceSheet.getCell(0, 7).numberValue;
             await sourceSheet.loadCells('A' + (completedRow+1) + ':H' + (rows + 3));
             // let completedPos = completedRow;
