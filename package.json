@@ -1,6 +1,6 @@
 {
   "name": "Fanbox-relationship-linker-for-VRChatGroup",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "",
   "main": "build/index.js",
   "engines": {
@@ -8,6 +8,7 @@
   },
   "scripts": {
     "start": "node build/index.js",
+    "test": "node build/test.js",
     "dev": "cross-env AWS_CREDENTIALS_FROM_LOCAL=true node --enable-source-maps build/index.js",
     "type-watch": "tsc -w",
     "build": "tsc",

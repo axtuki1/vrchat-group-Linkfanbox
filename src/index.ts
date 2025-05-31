@@ -12,6 +12,7 @@ import { GetUserInfoService } from "./db/services/GetUserInfoService";
 import { GetFanboxRelationshipTask } from "./task/GetFanboxRelationship";
 import { GetVRChatLinkInfo } from "./task/GetVRChatLinkInfo";
 import { CheckApplyUserTask } from "./task/CheckApplyUser";
+import { UpdateSupporterListTask } from "./task/UpdateSupporterList";
 const { parse } = require("jsonc-parser");
 const config = (() => {
     const json = fs.readFileSync("./config/config.json");
@@ -191,8 +192,14 @@ const Main = async () => {
         }
     );
 
+    const updateSupporterList = new UpdateSupporterListTask((e) => {
+        logger.error("UpdateSupporterListTask Error: " + e);
+        discord.sendMessage("UpdateSupporterListTask Error: " + e);
+    });
+
     setTimeout(() => {
         checkApplyUsertask.start();
+        updateSupporterList.start();
     }, 1000 * 60 * 5); // 5 minutes delay
 
     const exitProcess = async () => {

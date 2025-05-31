@@ -27,6 +27,10 @@
                 "privacy_policy_notification": "",
                 "agreement_master_terms_of_use_202408": ""
             }
+        },
+        "github": {
+            // GitHubトークン
+            "token": "<Tokentoken>"
         }
     },
     "settings": {
@@ -56,6 +60,19 @@
                     ]
                 }
             }
+        },
+        "gist":{
+            // Gist ID ※作成済のものを指定
+            "gistId": ""
+        },
+        "planName": {
+            // 各プランの名前
+            "<planId>": "<planName>",
+            "fileName": "supporterList.json"
+        },
+        "planDisplayName": {
+            // 各プランの表示名
+            "<planId>": "<planDisplayName>"
         }
     },
     "database": {
