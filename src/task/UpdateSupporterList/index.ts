@@ -33,7 +33,8 @@ export class UpdateSupporterListTask extends Task {
             const output = {
                 lastUpdatedAt: new Date().toISOString(),
                 supporterList: {} as Record<string, string[]>,
-                planDisplayName: {} as Record<string, string>
+                planDisplayName: {} as Record<string, string>,
+                comment: undefined
             };
 
             const supporterList: Record<string, string[]> = {};
@@ -90,7 +91,20 @@ export class UpdateSupporterListTask extends Task {
                 });
             output.planDisplayName = sortedPlanDisplayName;
 
+            if (config.settings.gist.comment) {
+                output.comment = config.settings.gist.comment;
+            }
+
             // GitHub Gistに更新
+
+            const toJsonClean = (obj: any): string => {
+                return JSON.stringify(obj, (_, value) => {
+                    if (value === "" || value === undefined) {
+                        return undefined;
+                    }
+                    return value;
+                }, 2);
+            }
 
             const gistId = config.settings.gist.gistId;
             const fileName = config.settings.gist.fileName;
@@ -108,7 +122,7 @@ export class UpdateSupporterListTask extends Task {
                 body: JSON.stringify({
                     files: {
                         [fileName]: {
-                            content: JSON.stringify(output, null, 2)
+                            content: toJsonClean(output)
                         }
                     }
                 })
