@@ -33,11 +33,6 @@ export class GroupRoleApplyTask extends Task {
             const groupMember = await this.vrchat.GetGroupMember(groupId, user.vrchatUserId);
             this.sleep(500);
             const userInfo = await this.vrchat.GetUserInfo(user.vrchatUserId);
-            if (!groupMember) {
-                this.logger.info("[" + user.vrchatUserId + "] User not found in group.");
-                return;
-            }
-            this.logger.info("[" + user.vrchatUserId + "] User found in group: " + groupMember.userId);
             if (!user.vrchatDisplayName || user.vrchatDisplayName != userInfo.displayName) {
                 await this.repo.updateUser(
                     user.userId,
@@ -45,6 +40,12 @@ export class GroupRoleApplyTask extends Task {
                 );
                 this.logger.info("[" + user.vrchatUserId + "] Updated display name: " + userInfo.displayName);
             }
+            if (!groupMember) {
+                this.logger.info("[" + user.vrchatUserId + "] User not found in group.");
+                return;
+            }
+            this.logger.info("[" + user.vrchatUserId + "] User found in group: " + groupMember.userId);
+            
 
             const groupRolesIds = groupMember.roleIds;
             Object.keys(roles).forEach(async (roleId) => {

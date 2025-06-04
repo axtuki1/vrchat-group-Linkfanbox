@@ -199,8 +199,11 @@ const Main = async () => {
 
     setTimeout(() => {
         checkApplyUsertask.start();
+    }, 1000 * 60 * 2); 
+
+    setTimeout(() => {
         updateSupporterList.start();
-    }, 1000 * 60 * 5); // 5 minutes delay
+    }, 1000 * 60 * 4); 
 
     const exitProcess = async () => {
         console.log("Exitting...");
