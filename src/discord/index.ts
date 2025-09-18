@@ -1,4 +1,10 @@
-
+import { DiscordBotClient } from "./client";
+import * as fs from "fs";
+const { parse } = require("jsonc-parser");
+const config = (() => {
+    const json = fs.readFileSync("./config/config.json");
+    return parse(json.toString());
+})();
 
 export class Discord {
 
@@ -21,6 +27,12 @@ export class Discord {
         if (response.status !== 204) {
             throw new Error("Failed to send message to Discord webhook. Status code: " + response.status);
         }
+    }
+
+    public static genDiscordBot(token: string): DiscordBotClient{
+        const bot = new DiscordBotClient();
+        bot.login(token);
+        return bot;
     }
 
 }

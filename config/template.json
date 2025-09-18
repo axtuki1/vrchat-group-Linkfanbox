@@ -31,6 +31,9 @@
         "github": {
             // GitHubトークン
             "token": "<Tokentoken>"
+        },
+        "discord": {
+            "token": "<Tokentoken>"
         }
     },
     "settings": {
