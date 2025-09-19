@@ -205,7 +205,9 @@ const Main = async () => {
         updateSupporterList.start();
     }, 1000 * 60 * 4); 
 
-    Discord.genDiscordBot(config.authentication.discord.token);
+    const bot = Discord.genDiscordBot(config.authentication.discord.token);
+
+    
 
     const exitProcess = async () => {
         console.log("Exitting...");
