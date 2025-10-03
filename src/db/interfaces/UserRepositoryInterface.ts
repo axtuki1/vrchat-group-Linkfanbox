@@ -6,7 +6,8 @@ export interface UserRepositoryInterface {
         vrchatDisplayName: string,
         vrchatUserId: string,
         pixivUserId: string,
-        fanboxPlanId: string | null
+        fanboxPlanId: string | null,
+        planUpdateAt: Date
     ): Promise<any>;
     updateUser(
         userId: string,
@@ -15,6 +16,7 @@ export interface UserRepositoryInterface {
             vrchatUserId?: string;
             pixivUserId?: string;
             fanboxPlanId?: string | null;
+            planUpdateAt?: Date;
         }
     ): Promise<any>;
     getUserByPixivId(pixivUserId: string): Promise<any>;

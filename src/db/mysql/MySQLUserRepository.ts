@@ -63,7 +63,7 @@ export class MySQLUserRepository extends MySQLBaseRepository implements UserRepo
     async getRegisteredUsers(): Promise<any> {
         try {
             const res = await this.connection.query(
-                `SELECT * FROM users WHERE updateAt >= DATE_ADD(now(), INTERVAL -1 MONTH)`
+                `SELECT * FROM users WHERE planUpdateAt >= DATE_ADD(now(), INTERVAL -1 MONTH)`
             );
             return res[0];
         } catch (error) {
@@ -88,6 +88,7 @@ export class MySQLUserRepository extends MySQLBaseRepository implements UserRepo
         vrchatUserId?: string,
         pixivUserId?: string,
         fanboxPlanId?: string | null
+        planUpdateAt?: Date
     }): Promise<any> {
         try {
             const fields = Object.keys(data)
@@ -108,7 +109,8 @@ export class MySQLUserRepository extends MySQLBaseRepository implements UserRepo
         vrchatDisplayName: string,
         vrchatUserId: string,
         pixivUserId: string,
-        fanboxPlanId: string | null = null
+        fanboxPlanId: string | null = null,
+        planUpdateAt: Date = new Date()
     ): Promise<any> {
 
         const user = new User(
@@ -118,6 +120,7 @@ export class MySQLUserRepository extends MySQLBaseRepository implements UserRepo
             pixivUserId,
             new Date(),
             new Date(),
+            planUpdateAt,
             fanboxPlanId
         );
 

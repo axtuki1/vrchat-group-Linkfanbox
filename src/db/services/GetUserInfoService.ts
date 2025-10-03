@@ -30,6 +30,7 @@ export class GetUserInfoService {
                 user.pixivUserId,
                 user.createAt,
                 user.updateAt,
+                user.planUpdateAt,
                 user.fanboxPlanId,
             );;
         } catch (error) {
@@ -51,6 +52,7 @@ export class GetUserInfoService {
                 user.pixivUserId,
                 user.createAt,
                 user.updateAt,
+                user.planUpdateAt,
                 user.fanboxPlanId,
             );;
         } catch (error) {
@@ -70,6 +72,7 @@ export class GetUserInfoService {
                     user.pixivUserId,
                     user.createAt,
                     user.updateAt,
+                    user.planUpdateAt,
                     user.fanboxPlanId,
                 );
             });
@@ -90,6 +93,7 @@ export class GetUserInfoService {
             vrchatUserId?: string;
             pixivUserId?: string;
             fanboxPlanId?: string | null;
+            planUpdateAt?: Date;
         }
     ): Promise<void> {
         try {
@@ -105,14 +109,16 @@ export class GetUserInfoService {
         vrchatUserId: string,
         pixivUserId: string,
         vrchatDisplayName: string = "",
-        fanboxPlanId: string = ""
+        fanboxPlanId: string = "",
+        planUpdateAt: Date = new Date()
     ): Promise<void> {
         try {
             const user = await this.userRepository.registerUser(
                 vrchatDisplayName,
                 vrchatUserId,
                 pixivUserId,
-                fanboxPlanId
+                fanboxPlanId,
+                planUpdateAt
             );
             return;
         } catch (error) {
