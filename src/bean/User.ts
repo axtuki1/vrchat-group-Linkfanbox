@@ -6,6 +6,7 @@ export class User {
     public discordUserId?: string;
     public createdAt: Date;
     public updatedAt: Date;
+    public planUpdateAt: Date;
     public fanboxPlanId: string;
 
     constructor(
@@ -16,6 +17,7 @@ export class User {
         discordUserId: string,
         createdAt: Date,
         updatedAt: Date,
+        planUpdateAt: Date,
         fanboxPlanId: string
     ) {
         this.userId = userId;
@@ -25,6 +27,7 @@ export class User {
         this.discordUserId = discordUserId;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+        this.planUpdateAt = planUpdateAt;
         this.fanboxPlanId = fanboxPlanId;
     }
 }

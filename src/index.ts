@@ -128,7 +128,10 @@ const Main = async () => {
                         if (user != null) {
                             await repo.updateUser(
                                 user.userId,
-                                { fanboxPlanId: planId }
+                                { 
+                                    fanboxPlanId: planId,
+                                    planUpdateAt: new Date()
+                                }
                             );
                             logger.info("Updated user: " + supporter.name + " (" + supporter.userId + ") -> " + planId);
                         } else {
