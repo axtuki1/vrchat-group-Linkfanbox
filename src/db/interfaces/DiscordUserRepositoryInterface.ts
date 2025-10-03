@@ -4,14 +4,11 @@ import { User } from "../../bean/User";
 export interface DiscordUserRepositoryInterface {
     registerDiscordUser(
         discordUserId: string,
-        discordUsername: string,
         vrchatUserId: string | null,
-        vrchatDisplayName: string | null,
     ): Promise<any>;
     updateDiscordUserByDiscordUserId(
         discordUserId: string,
         data: {
-            discordUsername?: string;
             vrchatUserId: string | null;
         }
     ): Promise<any>;

@@ -9,7 +9,7 @@ export class MySQLUserRepository extends MySQLBaseRepository implements UserRepo
     async getUserById(userId: string): Promise<any> {
         try {
             const res = await this.connection.execute(
-                `SELECT * FROM users WHERE userId = ?`,
+                `SELECT * FROM users_with_vrchat WHERE userId = ?`,
                 [userId]
             );
             if (!res || res.length === 0) {
@@ -27,7 +27,7 @@ export class MySQLUserRepository extends MySQLBaseRepository implements UserRepo
     async getUserByPixivId(pixivUserId: string): Promise<any> {
         try {
             const res = await this.connection.query(
-                `SELECT * FROM users WHERE pixivUserId = ?`,
+                `SELECT * FROM users_with_vrchat WHERE pixivUserId = ?`,
                 [pixivUserId]
             );
             if (!res || res.length === 0) {
@@ -45,7 +45,7 @@ export class MySQLUserRepository extends MySQLBaseRepository implements UserRepo
     async getUserByVrchatId(vrchatUserId: string): Promise<any> {
         try {
             const res = await this.connection.query(
-                `SELECT * FROM users WHERE vrchatUserId = ?`,
+                `SELECT * FROM users_with_vrchat WHERE vrchatUserId = ?`,
                 [vrchatUserId]
             );
             if (!res || res.length === 0) {
@@ -63,7 +63,7 @@ export class MySQLUserRepository extends MySQLBaseRepository implements UserRepo
     async getRegisteredUsers(): Promise<any> {
         try {
             const res = await this.connection.query(
-                `SELECT * FROM users WHERE updateAt >= DATE_ADD(now(), INTERVAL -1 MONTH)`
+                `SELECT * FROM users_with_vrchat WHERE updateAt >= DATE_ADD(now(), INTERVAL -1 MONTH)`
             );
             return res[0];
         } catch (error) {
@@ -74,7 +74,7 @@ export class MySQLUserRepository extends MySQLBaseRepository implements UserRepo
     async getRegisteredUsersByFanboxPlanId(fanboxPlanId: string): Promise<any> {
         try {
             const res = await this.connection.query(
-                `SELECT * FROM users WHERE fanboxPlanId = ? AND updateAt >= DATE_ADD(now(), INTERVAL -1 MONTH)`,
+                `SELECT * FROM users_with_vrchat WHERE fanboxPlanId = ? AND updateAt >= DATE_ADD(now(), INTERVAL -1 MONTH)`,
                 [fanboxPlanId]
             );
             return res[0];
@@ -91,31 +91,49 @@ export class MySQLUserRepository extends MySQLBaseRepository implements UserRepo
     }): Promise<any> {
         try {
             const fields = Object.keys(data)
-            .map(key => `${key} = ?`)
-            .join(", ");
-            const values = Object.values(data);
-            const res = await this.connection.query(
-                `UPDATE users SET ${fields}, updateAt = NOW() WHERE userId = ?`,
-                [...values, userId]
-            );
-            return res;
+                .map(key => `${key} = ?`)
+                .join(", ");
+            // const values = Object.values(data);
+            // const res = await this.connection.query(
+            //     `UPDATE users_with_vrchat SET ${fields}, updateAt = NOW() WHERE userId = ?`,
+            //     [...values, userId]
+            // );
+            if ("vrchatDisplayName" in data) {
+                await this.connection.query(
+                    "UPDATE vrchat_users v JOIN users u ON v.userId = u.vrchatUserId SET v.userName = ?, v.updateAt = NOW() WHERE u.userId = ?",
+                    [data.vrchatDisplayName, userId]
+                );
+                delete data.vrchatDisplayName;
+            }
+
+            if (Object.keys(data).length > 0) {
+                const fields = Object.keys(data).map(key => `${key} = ?`).join(", ");
+                const values = Object.values(data);
+                await this.connection.query(
+                    `UPDATE users SET ${fields}, updateAt = NOW() WHERE userId = ?`,
+                    [...values, userId]
+                );
+            }
+
+            return true;
         } catch (error) {
             console.error("Error:", error);
-        }  
+        }
     }
 
     async registerUser(
-        vrchatDisplayName: string,
-        vrchatUserId: string,
-        pixivUserId: string,
+        vrchatUserId: string | null = null,
+        pixivUserId: string | null = null,
+        discordUserId: string | null = null,
         fanboxPlanId: string | null = null
     ): Promise<any> {
 
         const user = new User(
             uuid(),
-            vrchatDisplayName,
+            null,
             vrchatUserId,
             pixivUserId,
+            discordUserId,
             new Date(),
             new Date(),
             fanboxPlanId
