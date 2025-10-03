@@ -132,6 +132,7 @@ export class DynamoDBUserRepository extends DynamoDBBaseRepository implements Us
         vrchatDisplayName: string,
         vrchatUserId: string,
         pixivUserId: string,
+        discordUserId: string | null = null,
         fanboxPlanId: string | null = null
     ): Promise<any> {
 
@@ -140,6 +141,7 @@ export class DynamoDBUserRepository extends DynamoDBBaseRepository implements Us
             vrchatDisplayName,
             vrchatUserId,
             pixivUserId,
+            discordUserId,
             new Date(),
             new Date(),
             new Date(),

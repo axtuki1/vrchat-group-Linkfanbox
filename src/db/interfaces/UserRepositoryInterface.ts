@@ -6,6 +6,7 @@ export interface UserRepositoryInterface {
         vrchatDisplayName: string,
         vrchatUserId: string,
         pixivUserId: string,
+        discordUserId: string | null,
         fanboxPlanId: string | null,
         planUpdateAt: Date
     ): Promise<any>;
@@ -15,6 +16,7 @@ export interface UserRepositoryInterface {
             vrchatDisplayName?: string;
             vrchatUserId?: string;
             pixivUserId?: string;
+            discordUserId?: string | null;
             fanboxPlanId?: string | null;
             planUpdateAt?: Date;
         }
