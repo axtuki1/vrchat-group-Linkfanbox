@@ -142,6 +142,7 @@ export class DynamoDBUserRepository extends DynamoDBBaseRepository implements Us
             pixivUserId,
             new Date(),
             new Date(),
+            new Date(),
             fanboxPlanId
         );
 
