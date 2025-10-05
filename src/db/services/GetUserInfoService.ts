@@ -28,6 +28,7 @@ export class GetUserInfoService {
                 user.vrchatDisplayName,
                 user.vrchatUserId,
                 user.pixivUserId,
+                user.discordUserId,
                 user.createAt,
                 user.updateAt,
                 user.planUpdateAt,
@@ -50,6 +51,7 @@ export class GetUserInfoService {
                 user.vrchatDisplayName,
                 user.vrchatUserId,
                 user.pixivUserId,
+                user.discordUserId,
                 user.createAt,
                 user.updateAt,
                 user.planUpdateAt,
@@ -70,6 +72,7 @@ export class GetUserInfoService {
                     user.vrchatDisplayName,
                     user.vrchatUserId,
                     user.pixivUserId,
+                    user.discordUserId,
                     user.createAt,
                     user.updateAt,
                     user.planUpdateAt,
@@ -107,8 +110,9 @@ export class GetUserInfoService {
 
     async registerUser(
         vrchatUserId: string,
-        pixivUserId: string,
+        pixivUserId: string | null = null,
         vrchatDisplayName: string = "",
+        discordUserId: string | null = null,
         fanboxPlanId: string = "",
         planUpdateAt: Date = new Date()
     ): Promise<void> {
@@ -117,6 +121,7 @@ export class GetUserInfoService {
                 vrchatDisplayName,
                 vrchatUserId,
                 pixivUserId,
+                discordUserId,
                 fanboxPlanId,
                 planUpdateAt
             );

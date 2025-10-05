@@ -33,10 +33,13 @@
             "token": "<Tokentoken>"
         },
         "discord": {
-            "token": "<Tokentoken>"
+            "token": "<Tokentoken>",
+            "clientId": "",
+            "guildId": ""
         }
     },
     "settings": {
+        "useBotOnly": false,
         "spreadsheet": {
             // 処理完了位置を示すセル
             "completedRowCountCell": "I1",

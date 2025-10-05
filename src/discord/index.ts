@@ -6,7 +6,7 @@ const config = (() => {
     return parse(json.toString());
 })();
 
-export class Discord {
+export class DiscordWebHook {
 
     private webhookUrl: string = null;
 
@@ -29,9 +29,9 @@ export class Discord {
         }
     }
 
-    public static genDiscordBot(token: string): DiscordBotClient{
+    public static async genDiscordBot(token: string): Promise<DiscordBotClient>{
         const bot = new DiscordBotClient();
-        bot.login(token);
+        await bot.login(token);
         return bot;
     }
 
