@@ -16,6 +16,7 @@ export abstract class SlashCommand {
     public abstract description: string;
     public abstract options?: any[];
     public subCommands: SlashCommand[];
+    public processStartTimeStamp: Date;
 
     constructor(bot: DiscordBotClient) {
         this.bot = bot;

@@ -7,7 +7,7 @@ const config = (() => {
 import { Client, Collection, Events, GatewayIntentBits, MessageFlags, REST, Routes } from "discord.js";
 import { SlashCommand } from "./slashCommand";
 import * as Commands from "./commands";
-import * as Permissions from "./permissions";
+// import * as Permissions from "./permissions";
 import { Logger } from "../../util/logger";
 import rndstr from "rndstr";
 import { PermissionData } from "./permission";
@@ -45,6 +45,7 @@ export class DiscordBotClient {
             }
 
             try {
+                command.processStartTimeStamp = new Date();
                 await command.execute(interaction);
             } catch (error) {
                 const errId = rndstr({ length: 10 });
