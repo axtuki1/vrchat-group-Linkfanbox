@@ -1,5 +1,6 @@
 import { ChatInputCommandInteraction, SlashCommandBuilder, SlashCommandSubcommandBuilder } from "discord.js";
 import { DiscordBotClient } from ".";
+import { Logger } from "../../util/logger";
 
 export interface SlashCommandOption {
     name: string;
@@ -11,13 +12,14 @@ export interface SlashCommandOption {
 
 export abstract class SlashCommand {
 
-    public bot: DiscordBotClient;
     public abstract name: string;
     public abstract description: string;
     public abstract options?: any[];
+    public bot: DiscordBotClient;
     public subCommands: SlashCommand[];
     public processStartTimeStamp: Date;
     public processStartPerformance: number;
+    public abstract logger: Logger;
 
     constructor(bot: DiscordBotClient) {
         this.bot = bot;

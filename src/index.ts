@@ -13,6 +13,7 @@ import { GetFanboxRelationshipTask } from "./task/GetFanboxRelationship";
 import { GetVRChatLinkInfo } from "./task/GetVRChatLinkInfo";
 import { CheckApplyUserTask } from "./task/CheckApplyUser";
 import { UpdateSupporterListTask } from "./task/UpdateSupporterList";
+import { GetDiscordRoleToSupportPlanTask } from "./task/GetDiscordRoleToSupportPlan";
 const { parse } = require("jsonc-parser");
 const config = (() => {
     const json = fs.readFileSync("./config/config.json");
@@ -221,6 +222,10 @@ const Main = async () => {
         config.authentication.discord.clientId,
         config.authentication.discord.guildId
     );
+
+    const getDiscordRoleToSupportPlanTask = new GetDiscordRoleToSupportPlanTask(bot);
+
+    getDiscordRoleToSupportPlanTask.start();
 
     const exitProcess = async () => {
         console.log("Exitting...");

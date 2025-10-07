@@ -11,6 +11,7 @@ import * as Commands from "./commands";
 import { Logger } from "../../util/logger";
 import rndstr from "rndstr";
 import { PermissionData } from "./permission";
+import { Task } from "../../task";
 
 export class DiscordBotClient {
 
@@ -22,6 +23,7 @@ export class DiscordBotClient {
         [key: string]: string[];
     };
     private token: string;
+    private tasks: [string, Task][];
 
     constructor() {
 
@@ -47,11 +49,12 @@ export class DiscordBotClient {
             try {
                 command.processStartTimeStamp = new Date();
                 command.processStartPerformance = performance.now();
+                command.bot = this;
                 await command.execute(interaction);
             } catch (error) {
                 const errId = rndstr({ length: 10 });
                 this.logger.error(`スラッシュコマンド実行時にエラーが発生しました。[ERRID: ${errId}]`);
-                this.logger.error(error);
+                console.error(error);
                 if (interaction.replied || interaction.deferred) {
                     await interaction.followUp({ content: `コマンド実行中にエラーが発生しました。ERRID: ${errId}`, flags: MessageFlags.Ephemeral });
                 } else {
@@ -92,7 +95,7 @@ export class DiscordBotClient {
 
     public async registerCommands(clientId: string, guildId: string) {
 
-        if(!this.token) {
+        if (!this.token) {
             throw new Error("Bot is not logged in.");
         }
 
@@ -118,6 +121,22 @@ export class DiscordBotClient {
             this.logger.error(error);
         }
 
+    }
+
+    public registerTask(task: Task) {
+        if (!this.tasks) this.tasks = [];
+        const existingIndex = this.tasks.findIndex(([name, _]) => name === task.constructor.name);
+        if( existingIndex !== -1 ) {
+            this.logger.warn(`Task ${task.constructor.name} is already registered. Skipping duplicate registration.`);
+            return;
+        }
+        this.tasks.push([task.constructor.name, task]);
+    }
+
+    public getTask<T extends Task>(taskClass: new (...args: any[]) => T): T | undefined {
+        const taskName = taskClass.name;
+        const taskEntry = this.tasks.find(([name, task]) => name === taskName);
+        return taskEntry ? taskEntry[1] as T : undefined;
     }
 
 

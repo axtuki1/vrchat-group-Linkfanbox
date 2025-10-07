@@ -164,8 +164,8 @@ export class MySQLUserRepository extends MySQLBaseRepository implements UserRepo
 
         try {
             const res = await this.connection.query(
-                `INSERT INTO users (userId, vrchatUserId, pixivUserId, fanboxPlanId, createAt, updateAt) VALUES (?, ?, ?, ?, NOW(), NOW())`,
-                [user.userId, user.vrchatUserId, user.pixivUserId, user.fanboxPlanId]
+                `INSERT INTO users (userId, vrchatUserId, pixivUserId, discordUserId, fanboxPlanId, createAt, updateAt) VALUES (?, ?, ?, ?, ?, NOW(), NOW())`,
+                [user.userId, user.vrchatUserId, user.pixivUserId, user.discordUserId, user.fanboxPlanId]
             );
             return res;
         } catch (error) {

@@ -3,6 +3,8 @@ import { SlashCommand } from "../slashCommand";
 import { GetUserInfoService } from "../../../db/services/GetUserInfoService";
 import { UserRepositoryFactory } from "../../../db/factories/UserRepositoryFactory";
 import * as fs from "fs";
+import { Logger } from "../../../util/logger";
+import { GetDiscordRoleToSupportPlanTask } from "../../../task/GetDiscordRoleToSupportPlan";
 const { parse } = require("jsonc-parser");
 const config = (() => {
     const json = fs.readFileSync("./config/config.json");
@@ -18,6 +20,7 @@ export class RefreshCommand extends SlashCommand {
     public options = [
 
     ];
+    public logger: Logger = new Logger("RefreshCommand");
     private repo: GetUserInfoService = new GetUserInfoService(UserRepositoryFactory.create());
     public async execute(interaction: ChatInputCommandInteraction) {
         await interaction.reply({
@@ -25,7 +28,9 @@ export class RefreshCommand extends SlashCommand {
             flags: MessageFlags.Ephemeral || MessageFlags.SuppressNotifications
         });
 
-        
+        const task: GetDiscordRoleToSupportPlanTask = this.bot.getTask(GetDiscordRoleToSupportPlanTask);
+
+        task.enqueue(interaction.user.id);
 
         await interaction.editReply({
             embeds: [
