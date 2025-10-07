@@ -23,7 +23,7 @@ export class MyDataCommand extends SlashCommand {
         
     ];
     public async execute(interaction: ChatInputCommandInteraction) {
-        const waitMsg = await interaction.reply({ 
+        await interaction.reply({ 
             embeds: [this.getPendingEmbed()],
             flags: MessageFlags.Ephemeral || MessageFlags.SuppressNotifications
         });
@@ -32,7 +32,6 @@ export class MyDataCommand extends SlashCommand {
 
         await wait(1000); // Simulate data fetching delay
 
-        await interaction.deleteReply(waitMsg.id);
         await interaction.editReply({ 
             embeds: [this.getDataEmbeds(myData)]
         });
@@ -40,7 +39,6 @@ export class MyDataCommand extends SlashCommand {
 
     private getPendingEmbed(): EmbedBuilder {
         const embed = new EmbedBuilder();
-        embed.setTitle("Loading...");
         embed.setDescription("おまちください....");
         embed.setColor(0xFF6347);
         embed.setFooter({ text: `受領日時: ${this.processStartTimeStamp.toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' })}` });
@@ -52,10 +50,16 @@ export class MyDataCommand extends SlashCommand {
         embed.setTitle("アカウント情報");
         embed.setColor(0x00FF00);
 
-        if(data.VRChat) {
+        if(data.VRChat && data.VRChat.id) {
             embed.addFields({
                 name: "VRChat",
                 value: `${data.VRChat.displayName}\n(${data.VRChat.id})`,
+                inline: false
+            });
+        } else {
+            embed.addFields({
+                name: "VRChat",
+                value: "未登録",
                 inline: false
             });
         }
@@ -72,6 +76,12 @@ export class MyDataCommand extends SlashCommand {
             embed.addFields({
                 name: "FANBOX加入プラン",
                 value: `${data.pixiv.planName}`,
+                inline: false
+            });
+        } else {
+            embed.addFields({
+                name: "FANBOX加入プラン",
+                value: "未加入",
                 inline: false
             });
         }

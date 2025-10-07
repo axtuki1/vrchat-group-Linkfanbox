@@ -88,6 +88,29 @@ export class DynamoDBUserRepository extends DynamoDBBaseRepository implements Us
         }
     }
 
+    async getUserByDiscordId(discordUserId: string): Promise<any> {
+        const params: QueryCommandInput = {
+            TableName: this.tableName,
+            IndexName: this.vrchatUserIdIndexName,
+            KeyConditionExpression: "discordUserId = :discordUserId",
+            ExpressionAttributeValues: {
+                ":discordUserId": discordUserId
+            }
+        };
+        try {
+            const data = await this.documentClient.send(
+                new QueryCommand(params)
+            )
+            if (data.Items && data.Items.length > 0) {
+                return data.Items[0];
+            } else {
+                return null;
+            }
+        } catch (error) {
+            console.error("Error:", error);
+        }
+    }
+
     async getRegisteredUsers(): Promise<any> {
         const params: ScanCommandInput = {
             TableName: this.tableName,

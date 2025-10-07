@@ -60,6 +60,24 @@ export class MySQLUserRepository extends MySQLBaseRepository implements UserRepo
         }
     }
 
+    async getUserByDiscordId(discordUserId: string): Promise<any> {
+        try {
+            const res = await this.connection.query(
+                `SELECT * FROM users_with_vrchat WHERE discordUserId = ?`,
+                [discordUserId]
+            );
+            if (!res || res.length === 0) {
+                return null;
+            }
+            if (res[0].length === 0) {
+                return null;
+            }
+            return res[0][0];
+        } catch (error) {
+            console.error("Error:", error);
+        }
+    }
+
     async getRegisteredUsers(): Promise<any> {
         try {
             const res = await this.connection.query(

@@ -63,6 +63,29 @@ export class GetUserInfoService {
         }
     }
 
+    async getUserInfoByDiscordId(discordUserId: string): Promise<User> {
+        try {
+            const user = await this.userRepository.getUserByDiscordId(discordUserId);
+            if (!user) {
+                return null;
+            }
+            return new User(
+                user.userId,
+                user.vrchatDisplayName,
+                user.vrchatUserId,
+                user.pixivUserId,
+                user.discordUserId,
+                user.createAt,
+                user.updateAt,
+                user.planUpdateAt,
+                user.fanboxPlanId,
+            );;
+        } catch (error) {
+            console.error('Error fetching user info by Discord ID:', error);
+            throw error;
+        }
+    }
+
     async getRegisteredUsers(): Promise<User[]> {
         try {
             const users = await this.userRepository.getRegisteredUsers();

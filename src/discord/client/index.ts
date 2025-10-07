@@ -46,6 +46,7 @@ export class DiscordBotClient {
 
             try {
                 command.processStartTimeStamp = new Date();
+                command.processStartPerformance = performance.now();
                 await command.execute(interaction);
             } catch (error) {
                 const errId = rndstr({ length: 10 });

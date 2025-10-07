@@ -23,6 +23,7 @@ export interface UserRepositoryInterface {
     ): Promise<any>;
     getUserByPixivId(pixivUserId: string): Promise<any>;
     getUserByVrchatId(vrchatUserId: string): Promise<any>;
+    getUserByDiscordId(discordUserId: string): Promise<any>;
     getUserById(userId: string): Promise<any>;
     getRegisteredUsers(): Promise<any>;
     getRegisteredUsersByFanboxPlanId(fanboxPlanId: string): Promise<any>;
