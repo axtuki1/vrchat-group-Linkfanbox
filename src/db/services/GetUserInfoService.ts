@@ -115,9 +115,10 @@ export class GetUserInfoService {
     async updateUser(
         userId: string,
         data: {
-            vrchatDisplayName?: string;
-            vrchatUserId?: string;
-            pixivUserId?: string;
+            vrchatDisplayName?: string | null;
+            vrchatUserId?: string | null;
+            pixivUserId?: string | null;
+            discordUserId?: string | null;
             fanboxPlanId?: string | null;
             planUpdateAt?: Date;
         }

@@ -15,7 +15,7 @@ import { PermissionData } from "./permission";
 export class DiscordBotClient {
 
     private logger: Logger;
-    private client: Client;
+    public client: Client;
     private commands: SlashCommand[];
     private commandMap: Record<string, SlashCommand>;
     private permissions: {

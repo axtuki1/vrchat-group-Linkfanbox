@@ -13,9 +13,9 @@ export class RegisterVRChatUserCommand extends SlashCommand {
     ];
 
     private repo: GetUserInfoService = new GetUserInfoService(UserRepositoryFactory.create());
-    
+
     public async execute(interaction: ChatInputCommandInteraction) {
-        await interaction.reply({ 
+        await interaction.reply({
             embeds: [
                 new EmbedBuilder()
                     .setDescription("登録中....")
@@ -25,8 +25,8 @@ export class RegisterVRChatUserCommand extends SlashCommand {
         });
 
         const userId = interaction.options.getString("user_id");
-        if(!userId) {
-            await interaction.editReply({ 
+        if (!userId) {
+            await interaction.editReply({
                 embeds: [
                     this.getResponseTemplate()
                         .setTitle("エラー")
@@ -35,8 +35,8 @@ export class RegisterVRChatUserCommand extends SlashCommand {
                 ]
             });
             return;
-        } else if(!userId.match(/^usr_[0-9a-zA-Z]+$/)) {
-            await interaction.editReply({ 
+        } else if (!userId.match(/^usr_[0-9a-zA-Z]+$/)) {
+            await interaction.editReply({
                 embeds: [
                     this.getResponseTemplate()
                         .setTitle("エラー")
@@ -52,30 +52,75 @@ export class RegisterVRChatUserCommand extends SlashCommand {
         const existsUser = await this.repo.getUserInfoByDiscordId(interaction.user.id);
 
         if (!existsUser) {
-            // 新規
-            await this.repo.registerUser(
-                userId,
-                null,
-                null,
-                interaction.user.id,
-                null,
-                null
-            );
+            // Discordでははじめまして
+            // でもVRChatでは登録済みかも？
+            const existsVRChatUser = await this.repo.getUserInfoByVrchatId(userId);
+            if (existsVRChatUser) {
+                // DBに存在する同一VRChatアカウントIDに、DiscordIDが紐づいていない場合はDiscordIDを紐づける
+                if (!existsVRChatUser.discordUserId) {
+                    await this.repo.updateUser(existsVRChatUser.userId, {
+                        discordUserId: interaction.user.id
+                    });
+                    await interaction.editReply({
+                        embeds: [
+                            this.getResponseTemplate()
+                                .setTitle("登録完了")
+                                .setDescription("登録が完了しました。")
+                                .setColor(0x00FF00)
+                        ]
+                    });
+                } else {
+                    // すでに紐づいているならエラーとする
+                    await interaction.editReply({
+                        embeds: [
+                            this.getResponseTemplate()
+                                .setTitle("エラー")
+                                .setDescription(
+                                    `そのVRChatアカウントはすでに他のDiscordアカウントに登録されています。
+                                    心当のない場合は管理者にお問い合わせください。`
+                                )
+                                .setColor(0xFF0000)
+                        ]
+                    });
+                }
+            } else {
+                // 新規
+                await this.repo.registerUser(
+                    userId,
+                    null,
+                    null,
+                    interaction.user.id,
+                    null,
+                    null
+                );
+                await interaction.editReply({
+                    embeds: [
+                        this.getResponseTemplate()
+                            .setTitle("登録完了")
+                            .setDescription("登録が完了しました。")
+                            .setColor(0x00FF00)
+                    ]
+                });
+                return;
+            }
+
         } else {
             // 更新
             await this.repo.updateUser(existsUser.userId, {
                 vrchatUserId: userId
-            })
+            });
+            await interaction.editReply({
+                embeds: [
+                    this.getResponseTemplate()
+                        .setTitle("更新完了")
+                        .setDescription("更新が完了しました。")
+                        .setColor(0x00FF00)
+                ]
+            });
+            return;
         }
 
-        await interaction.editReply({ 
-            embeds: [
-                this.getResponseTemplate()
-                    .setTitle("登録完了")
-                    .setDescription("登録が完了しました。")
-                    .setColor(0x00FF00)
-            ]
-        });
+
     }
 
     public getResponseTemplate(): EmbedBuilder {
