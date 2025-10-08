@@ -16,7 +16,8 @@ export abstract class SlashCommand {
     public abstract description: string;
     public abstract options?: any[];
     public bot: DiscordBotClient;
-    public subCommands: SlashCommand[];
+    public subCommands: (new (...args: any[]) => SlashCommand)[];
+    private subCommandInstances: SlashCommand[];
     public processStartTimeStamp: Date;
     public processStartPerformance: number;
     public abstract logger: Logger;
@@ -30,8 +31,10 @@ export abstract class SlashCommand {
     public getSlashCommand(): SlashCommandBuilder {
         const cmd = new SlashCommandBuilder().setName(this.name).setDescription(this.description);
         if (this.subCommands && this.subCommands.length > 0) {
-            this.subCommands.forEach(subCmdInstance => {
+            this.subCommands.forEach(subCmdClass => {
+                const subCmdInstance = new subCmdClass(this.bot);
                 cmd.addSubcommand(subCmd => subCmdInstance.getSlashSubCommand(subCmd));
+                this.subCommandInstances = this.subCommandInstances ? [...this.subCommandInstances, subCmdInstance] : [subCmdInstance];
             })
         }
         if (this.options && this.options.length > 0) {
@@ -127,6 +130,10 @@ export abstract class SlashCommand {
     public getSlashSubCommand(subCmd: SlashCommandSubcommandBuilder): SlashCommandSubcommandBuilder {
         subCmd.setName(this.name).setDescription(this.description);
         return subCmd;
+    }
+
+    public getSubCommands(): SlashCommand[] {
+        return this.subCommandInstances || [];
     }
 
     public getPendingEmbed(): EmbedBuilder {

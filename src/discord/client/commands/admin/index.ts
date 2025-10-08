@@ -1,15 +1,16 @@
 import { ChatInputCommandInteraction, MessageFlags } from "discord.js";
 import { SlashCommand } from "../../slashCommand";
 import { Logger } from "../../../../util/logger";
+import { QueueViewCommand } from "./queueView";
 
 export class AdminCommand extends SlashCommand {
     public name: string = "admin";
     public description: string = "管理者用コマンドです。";
     public options = [
     ];
-    public subCommands: SlashCommand[] = [
-        
-    ];
+    public subCommands: (new (...args: any[]) => SlashCommand)[] = [
+        // QueueViewCommand
+    ]
     public logger: Logger = new Logger("AdminCommand");
     public async execute(interaction: ChatInputCommandInteraction) {
         if(!interaction.memberPermissions.has("Administrator")) {
@@ -30,7 +31,7 @@ export class AdminCommand extends SlashCommand {
                     .setDescription("サブコマンドを指定してください。")
                     .setColor(0x00FF00);
         
-        this.subCommands.forEach(subCmd => {
+        this.getSubCommands().forEach(subCmd => {
             embed.addFields({ name: `/${this.name} ${subCmd.name}`, value: subCmd.description, inline: false });
         });
 

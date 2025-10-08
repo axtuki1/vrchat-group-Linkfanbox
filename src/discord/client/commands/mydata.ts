@@ -81,13 +81,15 @@ export class MyDataCommand extends SlashCommand {
             if (data.VRChat.displayName) {
                 embed.addFields({
                     name: "VRChat",
-                    value: `${data.VRChat.displayName}\n(${data.VRChat.id})`,
+                    value: `${data.VRChat.displayName}
+                    (${data.VRChat.id})`,
                     inline: false
                 });
             } else {
                 embed.addFields({
                     name: "VRChat",
-                    value: `※表示名取得待ち※ (${data.VRChat.id})`,
+                    value: `※表示名取得待ち※
+                    (${data.VRChat.id})`,
                     inline: false
                 });
             }
@@ -129,7 +131,7 @@ export class MyDataCommand extends SlashCommand {
             });
         }
 
-        if(data.queuePosition || data.queuePosition >= 0) {
+        if(data.queuePosition && data.queuePosition >= 0) {
             embed.addFields({
                 name: "更新待ち人数",
                 value: data.queuePosition > 0 ? `${data.queuePosition}人` : "開始待機中",
