@@ -1,4 +1,4 @@
-import { ChatInputCommandInteraction, SlashCommandBuilder, SlashCommandSubcommandBuilder } from "discord.js";
+import { ChatInputCommandInteraction, EmbedBuilder, SlashCommandBuilder, SlashCommandSubcommandBuilder } from "discord.js";
 import { DiscordBotClient } from ".";
 import { Logger } from "../../util/logger";
 
@@ -129,5 +129,18 @@ export abstract class SlashCommand {
         return subCmd;
     }
 
+    public getPendingEmbed(): EmbedBuilder {
+        const embed = new EmbedBuilder();
+        embed.setDescription("おまちください....");
+        embed.setColor(0xFF6347);
+        embed.setFooter({ text: `受領日時: ${this.processStartTimeStamp.toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' })}` });
+        return embed;
+    }
+
+    public getResponseTemplate(): EmbedBuilder {
+        return new EmbedBuilder().setFooter({
+            text: `受領日時: ${this.processStartTimeStamp.toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' })} (${(performance.now() - this.processStartPerformance).toPrecision(3)}ms)`
+        });
+    }
 
 }

@@ -49,7 +49,7 @@ export class CheckApplyUserTask extends Task {
         this.nextExecuteTime = new Date(new Date().getTime() + this.coolTime * 60 * 1000);
         // vrchatへ登録
         try {
-            const users = await this.repo.getRegisteredUsers();
+            const users = await this.repo.getAllUsers();
             if (users == null || users.length == 0) return;
             if (
                 config.settings.fanbox.plans == null ||
@@ -59,16 +59,14 @@ export class CheckApplyUserTask extends Task {
             for (const user of users) {
                 if (
                     user.vrchatUserId == null ||
-                    user.fanboxPlanId == null ||
-                    user.vrchatUserId == "" ||
-                    user.fanboxPlanId == ""
+                    user.vrchatUserId == ""
                 ) continue;
                 this.logger.debug("execute user: " + JSON.stringify(user));
                 const userId = user.vrchatUserId;
                 const planId = user.fanboxPlanId;
                 const groupIds = Object.keys(this.groupRoleList);
 
-                if (config.settings.fanbox.plans[planId] == null) continue;
+                // if (config.settings.fanbox.plans[planId] == null) continue;
 
                 for (const groupId of groupIds) {
                     const roleIds = this.groupRoleList[groupId];
@@ -77,8 +75,12 @@ export class CheckApplyUserTask extends Task {
                     for (const roleId of roleIds) {
                         applyList[roleId] = false;
                         if (
-                            config.settings.fanbox.plans[planId][groupId].indexOf(roleId) !== -1 ||
-                            config.settings.fanbox.plans[planId][groupId].indexOf("*") !== -1
+                            planId && 
+                            config.settings.fanbox.plans[planId] && 
+                            config.settings.fanbox.plans[planId][groupId] && (
+                                config.settings.fanbox.plans[planId][groupId].indexOf(roleId) !== -1 ||
+                                config.settings.fanbox.plans[planId][groupId].indexOf("*") !== -1
+                            )
                         ) {
                             applyList[roleId] = true;
                         }

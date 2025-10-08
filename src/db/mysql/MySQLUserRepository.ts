@@ -78,10 +78,10 @@ export class MySQLUserRepository extends MySQLBaseRepository implements UserRepo
         }
     }
 
-    async getRegisteredUsers(): Promise<any> {
+    async getAllUsers(): Promise<any> {
         try {
             const res = await this.connection.query(
-                `SELECT * FROM users_with_vrchat WHERE planUpdateAt >= DATE_ADD(now(), INTERVAL -1 MONTH)`
+                `SELECT * FROM users_with_vrchat`
             );
             return res[0];
         } catch (error) {
@@ -89,7 +89,18 @@ export class MySQLUserRepository extends MySQLBaseRepository implements UserRepo
         }
     }
 
-    async getRegisteredUsersByFanboxPlanId(fanboxPlanId: string): Promise<any> {
+    async getPlanAvailableUsers(): Promise<any> {
+        try {
+            const res = await this.connection.query(
+                `SELECT * FROM users_with_vrchat WHERE planUpdateAt >= DATE_ADD(now(), INTERVAL -1 MONTH) AND fanboxPlanId IS NOT NULL`,
+            );
+            return res[0];
+        } catch (error) {
+            console.error("Error:", error);
+        }
+    }
+
+    async getPlanAvailableUsersByFanboxPlanId(fanboxPlanId: string): Promise<any> {
         try {
             const res = await this.connection.query(
                 `SELECT * FROM users_with_vrchat WHERE fanboxPlanId = ? AND updateAt >= DATE_ADD(now(), INTERVAL -1 MONTH)`,

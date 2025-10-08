@@ -93,31 +93,31 @@ const Main = async () => {
 
     let isLogin = false;
 
-    await vrchat.LoginCheck().then((result) => {
-        isLogin = vrchat.isLogin;
-    }).catch((e) => {
-        logger.info("LoginCheck: " + e);
-        isLogin = false;
-    });
-
-    logger.info("Login check: " + Msg.YesNo(isLogin));
-
-    if (!isLogin) {
-        await vrchat.Login().then(async (result) => {
-            if (result.requiresTwoFactorAuth) {
-                await vrchat.TwoFactorAuth();
-            }
-        });
-    }
-
-    if (!vrchat.isLogin) {
-        logger.info("Login failed...");
-
-    } else {
-        logger.info("Login Success!");
-    }
-
     if (!config.settings.useBotOnly) {
+
+        await vrchat.LoginCheck().then((result) => {
+            isLogin = vrchat.isLogin;
+        }).catch((e) => {
+            logger.info("LoginCheck: " + e);
+            isLogin = false;
+        });
+
+        logger.info("Login check: " + Msg.YesNo(isLogin));
+
+        if (!isLogin) {
+            await vrchat.Login().then(async (result) => {
+                if (result.requiresTwoFactorAuth) {
+                    await vrchat.TwoFactorAuth();
+                }
+            });
+        }
+
+        if (!vrchat.isLogin) {
+            logger.info("Login failed...");
+
+        } else {
+            logger.info("Login Success!");
+        }
 
         const supportersFunc = async (supporters) => {
             logger.debug("GetFanboxRelationshipTask start");

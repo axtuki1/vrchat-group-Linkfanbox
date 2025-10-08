@@ -86,9 +86,9 @@ export class GetUserInfoService {
         }
     }
 
-    async getRegisteredUsers(): Promise<User[]> {
+    async getAllUsers(): Promise<User[]> {
         try {
-            const users = await this.userRepository.getRegisteredUsers();
+            const users = await this.userRepository.getAllUsers();
             const userList: User[] = users.map((user) => {
                 return new User(
                     user.userId,

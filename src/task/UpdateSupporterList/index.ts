@@ -27,7 +27,7 @@ export class UpdateSupporterListTask extends Task {
         this.nextExecuteTime = new Date(new Date().getTime() + this.coolTime * 60 * 1000);
         this.logger.info("Updating supporter list...");
         try {
-            const users = await this.repo.getRegisteredUsers();
+            const users = await this.repo.getAllUsers();
             if (!users || users.length === 0) return;
 
             const output = {
@@ -60,6 +60,8 @@ export class UpdateSupporterListTask extends Task {
                 if (!user.vrchatDisplayName) continue;
 
                 const planName = planNameList[user.fanboxPlanId];
+
+                if (!user.fanboxPlanId || !planName) continue;
 
                 if (!supporterList[planName]) {
                     supporterList[planName] = [];

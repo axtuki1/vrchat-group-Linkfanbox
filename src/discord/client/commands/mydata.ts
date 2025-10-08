@@ -4,6 +4,7 @@ import { GetUserInfoService } from "../../../db/services/GetUserInfoService";
 import { UserRepositoryFactory } from "../../../db/factories/UserRepositoryFactory";
 import * as fs from "fs";
 import { Logger } from "../../../util/logger";
+import { GetDiscordRoleToSupportPlanTask } from "../../../task/GetDiscordRoleToSupportPlan";
 const { parse } = require("jsonc-parser");
 const config = (() => {
     const json = fs.readFileSync("./config/config.json");
@@ -19,7 +20,10 @@ interface MyData {
         plan?: string;
         planName?: string;
     },
+    updateAt: Date;
+    planUpdateAt: Date;
     active: boolean;
+    queuePosition?: number;
 }
 
 const wait = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
@@ -38,7 +42,9 @@ export class MyDataCommand extends SlashCommand {
             flags: MessageFlags.Ephemeral || MessageFlags.SuppressNotifications
         });
 
-        const myData: MyData = { active: false, VRChat: {}, pixiv: {} };
+        const myData: MyData = { active: false, VRChat: {}, pixiv: {}, updateAt: null, planUpdateAt: null };
+
+        const task = this.bot.getTask(GetDiscordRoleToSupportPlanTask);
 
         const userData = await this.repo.getUserInfoByDiscordId(interaction.user.id);
         if (userData) {
@@ -54,6 +60,9 @@ export class MyDataCommand extends SlashCommand {
                 myData.pixiv.plan = userData.fanboxPlanId;
                 myData.pixiv.planName = config.settings.planDisplayName[userData.fanboxPlanId] || null;
             }
+            myData.updateAt = userData.updatedAt;
+            myData.planUpdateAt = userData.planUpdateAt;
+            myData.queuePosition = task.getQueuePosition(interaction.user.id);
         }
 
         await wait(1000); // Simulate data fetching delay
@@ -61,14 +70,6 @@ export class MyDataCommand extends SlashCommand {
         await interaction.editReply({
             embeds: [this.getDataEmbeds(myData)]
         });
-    }
-
-    private getPendingEmbed(): EmbedBuilder {
-        const embed = new EmbedBuilder();
-        embed.setDescription("おまちください....");
-        embed.setColor(0xFF6347);
-        embed.setFooter({ text: `受領日時: ${this.processStartTimeStamp.toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' })}` });
-        return embed;
     }
 
     private getDataEmbeds(data: MyData): EmbedBuilder {
@@ -119,12 +120,23 @@ export class MyDataCommand extends SlashCommand {
                 inline: false
             });
         }
+        
+        if (data.updateAt) {
+            embed.addFields({
+                name: "情報更新日時",
+                value: `${data.updateAt.toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' })}`,
+                inline: true
+            });
+        }
 
-        embed.addFields({
-            name: "状態",
-            value: data.active ? "有効" : "無効",
-            inline: false
-        });
+        if(data.queuePosition || data.queuePosition >= 0) {
+            embed.addFields({
+                name: "更新待ち人数",
+                value: data.queuePosition > 0 ? `${data.queuePosition}人` : "開始待機中",
+                inline: true
+            });
+        }
+        
 
         embed.setFooter({
             text: `受領日時: ${this.processStartTimeStamp.toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' })} (${(performance.now() - this.processStartPerformance).toPrecision(3)}ms)`

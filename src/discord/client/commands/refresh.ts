@@ -30,32 +30,36 @@ export class RefreshCommand extends SlashCommand {
 
         const task: GetDiscordRoleToSupportPlanTask = this.bot.getTask(GetDiscordRoleToSupportPlanTask);
 
-        task.enqueue(interaction.user.id);
+        const enqueueResult = task.enqueue(interaction.user.id);
 
-        await interaction.editReply({
-            embeds: [
-                this.getResponseTemplate()
-                    .setTitle("待機列に並びました")
+        if (enqueueResult > 0) {
+            await interaction.editReply({
+                embeds: [this.getResponseTemplate()
                     .setDescription(
                         `情報の更新をリクエストしました。順番に処理されますのでしばらくお待ちください。
                         更新された情報は/mydataコマンドで確認できます。`
                     )
+                    .addFields({ name: "現在の待ち人数", value: `${enqueueResult}人`, inline: true })
                     .setColor(0x00FF00)
-            ]
-        });
+                ]
+            });
+            this.logger.debug(`User ${interaction.user.id} is number ${enqueueResult} in the queue.`);
+            return;
+        } else {
+            await interaction.editReply({
+                embeds: [
+                    this.getResponseTemplate()
+                        .setTitle("待機列に並びました")
+                        .setDescription(
+                            `情報の更新をリクエストしました。順番に処理されますのでしばらくお待ちください。
+                        更新された情報は/mydataコマンドで確認できます。`
+                        )
+                        .addFields({ name: "現在の待ち人数", value: `待ち人数なし`, inline: true })
+                        .setColor(0x00FF00)
+                ]
+            });
+            this.logger.debug(`User ${interaction.user.id} is being processed immediately.`);
+        }
     }
 
-    private getPendingEmbed(): EmbedBuilder {
-        const embed = new EmbedBuilder();
-        embed.setDescription("おまちください....");
-        embed.setColor(0xFF6347);
-        embed.setFooter({ text: `受領日時: ${this.processStartTimeStamp.toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' })}` });
-        return embed;
-    }
-
-    public getResponseTemplate(): EmbedBuilder {
-        return new EmbedBuilder().setFooter({
-            text: `受領日時: ${this.processStartTimeStamp.toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' })} (${(performance.now() - this.processStartPerformance).toPrecision(3)}ms)`
-        });
-    }
 }

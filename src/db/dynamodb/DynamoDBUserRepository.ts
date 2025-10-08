@@ -6,6 +6,17 @@ import uuid from "ui7";
 
 export class DynamoDBUserRepository extends DynamoDBBaseRepository implements UserRepositoryInterface {
 
+    // 一旦置き
+    getAllUsers(): Promise<any> {
+        throw new Error("Method not implemented.");
+    }
+    getPlanAvailableUsers(): Promise<any> {
+        throw new Error("Method not implemented.");
+    }
+    getPlanAvailableUsersByFanboxPlanId(fanboxPlanId: string): Promise<any> {
+        throw new Error("Method not implemented.");
+    }
+
     
     updateUser(userId: string, data: { vrchatDisplayName?: string; vrchatUserId?: string; pixivUserId?: string; fanboxPlanId?: string | null; }): Promise<any> {
         throw new Error("Method not implemented.");
