@@ -10,6 +10,12 @@ export class DynamoDBUserRepository extends DynamoDBBaseRepository implements Us
     getAllUsers(): Promise<any> {
         throw new Error("Method not implemented.");
     }
+    getAllUsersWithDiscordId(): Promise<any> {
+        throw new Error("Method not implemented.");
+    }
+    getAllUserWithVrchatId(): Promise<any> {
+        throw new Error("Method not implemented.");
+    }
     getPlanAvailableUsers(): Promise<any> {
         throw new Error("Method not implemented.");
     }

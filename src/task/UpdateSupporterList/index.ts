@@ -27,7 +27,7 @@ export class UpdateSupporterListTask extends Task {
         this.nextExecuteTime = new Date(new Date().getTime() + this.coolTime * 60 * 1000);
         this.logger.info("Updating supporter list...");
         try {
-            const users = await this.repo.getAllUsers();
+            const users = await this.repo.getPlanAvailableUsers();
             if (!users || users.length === 0) return;
 
             const output = {

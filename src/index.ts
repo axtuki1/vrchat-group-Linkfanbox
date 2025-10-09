@@ -14,6 +14,7 @@ import { GetVRChatLinkInfo } from "./task/GetVRChatLinkInfo";
 import { CheckApplyUserTask } from "./task/CheckApplyUser";
 import { UpdateSupporterListTask } from "./task/UpdateSupporterList";
 import { GetDiscordRoleToSupportPlanTask } from "./task/GetDiscordRoleToSupportPlan";
+import { AllDiscordUserCheck } from "./task/AllDiscordUserCheck";
 const { parse } = require("jsonc-parser");
 const config = (() => {
     const json = fs.readFileSync("./config/config.json");
@@ -226,6 +227,10 @@ const Main = async () => {
     const getDiscordRoleToSupportPlanTask = new GetDiscordRoleToSupportPlanTask(bot);
 
     getDiscordRoleToSupportPlanTask.start();
+
+    const allDiscordUserCheck = new AllDiscordUserCheck(bot, getDiscordRoleToSupportPlanTask);
+    
+    allDiscordUserCheck.start();
 
     const exitProcess = async () => {
         console.log("Exitting...");

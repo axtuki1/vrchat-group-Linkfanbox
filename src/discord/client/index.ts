@@ -118,7 +118,8 @@ export class DiscordBotClient {
             this.logger.info(`Successfully reloaded ${data.length} application (/) commands.`);
         } catch (error) {
             // And of course, make sure you catch and log any errors!
-            this.logger.error(error);
+            this.logger.error("Error registering commands:");
+            console.error(error);
         }
 
     }

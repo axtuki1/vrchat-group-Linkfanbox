@@ -145,8 +145,19 @@ export abstract class SlashCommand {
     }
 
     public getResponseTemplate(): EmbedBuilder {
+        const elapsed = performance.now() - this.processStartPerformance;
+        let timeText: string;
+
+        if (elapsed < 1000) {
+            // 1秒未満はミリ秒で表示
+            timeText = `${elapsed.toFixed(1)}ms`;
+        } else {
+            // 1秒以上は秒で表示
+            timeText = `${(elapsed / 1000).toFixed(2)}s`;
+        }
+
         return new EmbedBuilder().setFooter({
-            text: `受領日時: ${this.processStartTimeStamp.toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' })} (${(performance.now() - this.processStartPerformance).toPrecision(3)}ms)`
+            text: `受領日時: ${this.processStartTimeStamp.toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' })} (${timeText})`
         });
     }
 

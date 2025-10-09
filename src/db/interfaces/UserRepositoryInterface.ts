@@ -61,6 +61,14 @@ export interface UserRepositoryInterface {
      */
     getAllUsers(): Promise<any>;
     /**
+     * DiscordのユーザーIDが登録されているユーザーをすべて取得します。
+     */
+    getAllUsersWithDiscordId(): Promise<any>;
+    /**
+     * VRChatのユーザーIDが登録されているユーザーをすべて取得します。
+     */
+    getAllUserWithVrchatId(): Promise<any>;
+    /**
      * プラン加入状態が確認できているユーザーをすべて取得します。（1ヶ月以内にプラン加入状態が確認できたユーザー）
      */
     getPlanAvailableUsers(): Promise<any>;

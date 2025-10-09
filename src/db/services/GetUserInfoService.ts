@@ -17,6 +17,10 @@ export class GetUserInfoService {
         }
     }
 
+    /**
+     * PixivのユーザーIDでユーザーを取得します。 
+     * @deprecated FANBOXから直接のデータ取得を廃止し、Discordのロールから加入プランの取得をするため、このメソッドは将来的に削除されます。
+     */
     async getUserInfoByPixivId(pixivUserId: string): Promise<User> {
         try {
             const user = await this.userRepository.getUserByPixivId(pixivUserId);
@@ -108,6 +112,84 @@ export class GetUserInfoService {
             return userList;
         } catch (error) {
             console.error('Error fetching registered users:', error);
+            throw error;
+        }
+    }
+
+    async getAllUsersWithDiscordId(): Promise<User[]> {
+        try {
+            const users = await this.userRepository.getAllUsersWithDiscordId();
+            const userList: User[] = users.map((user) => {
+                return new User(
+                    user.userId,
+                    user.vrchatDisplayName,
+                    user.vrchatUserId,
+                    user.pixivUserId,
+                    user.discordUserId,
+                    user.createAt,
+                    user.updateAt,
+                    user.planUpdateAt,
+                    user.fanboxPlanId,
+                );
+            });
+            if (!userList) {
+                return new User[0];
+            }
+            return userList;
+        } catch (error) {
+            console.error('Error fetching registered users with Discord ID:', error);
+            throw error;
+        }
+    }
+
+    async getAllUserWithVrchatId(): Promise<User[]> {
+        try {
+            const users = await this.userRepository.getAllUserWithVrchatId();
+            const userList: User[] = users.map((user) => {
+                return new User(
+                    user.userId,
+                    user.vrchatDisplayName,
+                    user.vrchatUserId,
+                    user.pixivUserId,
+                    user.discordUserId,
+                    user.createAt,
+                    user.updateAt,
+                    user.planUpdateAt,
+                    user.fanboxPlanId,
+                );
+            });
+            if (!userList) {
+                return new User[0];
+            }
+            return userList;
+        } catch (error) {
+            console.error('Error fetching registered users with VRChat ID:', error);
+            throw error;
+        }
+    }
+
+    async getPlanAvailableUsers(): Promise<User[]> {
+        try {
+            const users = await this.userRepository.getPlanAvailableUsers();
+            const userList: User[] = users.map((user) => {
+                return new User(
+                    user.userId,
+                    user.vrchatDisplayName,
+                    user.vrchatUserId,
+                    user.pixivUserId,
+                    user.discordUserId,
+                    user.createAt,
+                    user.updateAt,
+                    user.planUpdateAt,
+                    user.fanboxPlanId,
+                );
+            });
+            if (!userList) {
+                return new User[0];
+            }
+            return userList;
+        } catch (error) {
+            console.error('Error fetching plan available users:', error);
             throw error;
         }
     }

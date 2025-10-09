@@ -73,7 +73,8 @@ export class MyDataCommand extends SlashCommand {
     }
 
     private getDataEmbeds(data: MyData): EmbedBuilder {
-        const embed = new EmbedBuilder();
+        const embed = this.getResponseTemplate();
+        
         embed.setTitle("アカウント情報");
         embed.setColor(0x00FF00);
 
@@ -111,13 +112,13 @@ export class MyDataCommand extends SlashCommand {
 
         if (data.pixiv.plan) {
             embed.addFields({
-                name: "FANBOX加入プラン",
+                name: "FANBOX 有効プラン",
                 value: `${data.pixiv.planName}`,
                 inline: false
             });
         } else {
             embed.addFields({
-                name: "FANBOX加入プラン",
+                name: "FANBOX 有効プラン",
                 value: "未加入",
                 inline: false
             });
@@ -138,11 +139,6 @@ export class MyDataCommand extends SlashCommand {
                 inline: true
             });
         }
-        
-
-        embed.setFooter({
-            text: `受領日時: ${this.processStartTimeStamp.toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' })} (${(performance.now() - this.processStartPerformance).toPrecision(3)}ms)`
-        });
 
         return embed;
     }

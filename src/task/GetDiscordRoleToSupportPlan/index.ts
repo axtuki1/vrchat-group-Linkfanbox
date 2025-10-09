@@ -13,14 +13,14 @@ import { Logger } from "../../util/logger";
 export class GetDiscordRoleToSupportPlanTask extends Task {
 
     private logger: Logger = new Logger("GetDiscordRoleToSupportPlanTask");
-    private coolTime: number = 1440; // 24 hours
+    private coolTime: number = 0.00025; // 15 seconds
     private nextExecuteTime: Date;
     private bot: DiscordBotClient = null;
     private discordIdQueue: Array<string> = [];
 
     private repo: GetUserInfoService = new GetUserInfoService(UserRepositoryFactory.create());
 
-    constructor(bot: DiscordBotClient, coolTime: number = 0.1, errorHandler: Function = null) {
+    constructor(bot: DiscordBotClient, coolTime: number = 0.00025, errorHandler: Function = null) {
         super(errorHandler);
         this.coolTime = coolTime;
         this.bot = bot;

@@ -89,6 +89,28 @@ export class MySQLUserRepository extends MySQLBaseRepository implements UserRepo
         }
     }
 
+    async getAllUsersWithDiscordId(): Promise<any> {
+        try {
+            const res = await this.connection.query(
+                `SELECT * FROM users_with_vrchat WHERE discordUserId IS NOT NULL`
+            );
+            return res[0];
+        } catch (error) {
+            console.error("Error:", error);
+        }
+    }
+
+    async getAllUserWithVrchatId(): Promise<any> {
+        try {
+            const res = await this.connection.query(
+                `SELECT * FROM users_with_vrchat WHERE vrchatUserId IS NOT NULL`
+            );
+            return res[0];
+        } catch (error) {
+            console.error("Error:", error);
+        }
+    }
+
     async getPlanAvailableUsers(): Promise<any> {
         try {
             const res = await this.connection.query(

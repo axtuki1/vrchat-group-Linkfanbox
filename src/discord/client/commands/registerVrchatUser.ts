@@ -158,9 +158,4 @@ export class RegisterVRChatUserCommand extends SlashCommand {
 
     }
 
-    public getResponseTemplate(): EmbedBuilder {
-        return new EmbedBuilder().setFooter({
-            text: `受領日時: ${this.processStartTimeStamp.toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' })} (${(performance.now() - this.processStartPerformance).toPrecision(3)}ms)`
-        });
-    }
 }
