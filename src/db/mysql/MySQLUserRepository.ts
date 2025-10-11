@@ -167,7 +167,7 @@ export class MySQLUserRepository extends MySQLBaseRepository implements UserRepo
             if (vrchatDisplayName) {
                 await this.connection.query(
                     "UPDATE vrchat_users v JOIN users u ON v.userId = u.vrchatUserId SET v.userName = ?, v.updateAt = NOW() WHERE u.userId = ?",
-                    [data.vrchatDisplayName, userId]
+                    [vrchatDisplayName, userId]
                 );
             }
 
