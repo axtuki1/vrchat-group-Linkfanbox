@@ -5,6 +5,12 @@ import { RoleQueueItem } from "./RoleQueueItem";
 import { User } from "../../bean/User";
 import { GetUserInfoService } from "../../db/services/GetUserInfoService";
 import { UserRepositoryFactory } from "../../db/factories/UserRepositoryFactory";
+import * as fs from "fs";
+const { parse } = require("jsonc-parser");
+const config = (() => {
+    const json = fs.readFileSync("./config/config.json");
+    return parse(json.toString());
+})();
 
 export class GroupRoleApplyTask extends Task {
 
@@ -27,7 +33,7 @@ export class GroupRoleApplyTask extends Task {
         this.isProcessing = true;
         try {
             const { user, groupId, roles } = this.queue.shift();
-            if (!user || !roles) {
+            if (!user || !roles || user.vrchatUserId in config.settings.ignoreUsers[groupId]) {
                 return;
             }
             const groupMember = await this.vrchat.GetGroupMember(groupId, user.vrchatUserId);

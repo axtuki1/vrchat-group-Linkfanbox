@@ -93,6 +93,11 @@
             "roleIdForPlan": {
                 "<planId>": "<roleId>", // 
             }
+        },
+        "ignoreUsers": {
+            "<groupId>": [
+                "<userId>"
+            ]
         }
     },
     "database": {
