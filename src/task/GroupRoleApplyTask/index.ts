@@ -33,9 +33,14 @@ export class GroupRoleApplyTask extends Task {
         this.isProcessing = true;
         try {
             const { user, groupId, roles } = this.queue.shift();
-            if (!user || !roles || user.vrchatUserId in config.settings.ignoreUsers[groupId]) {
+            if (!user || !roles) {
                 return;
             }
+            if (config.settings.ignoreUsers && config.settings.ignoreUsers.includes(user.userId)) {
+                this.logger.info("[" + user.vrchatUserId + "] User is in ignore list. Skipping role application.");
+                return;
+            }
+            this.logger.info("Processing user: " + user.vrchatUserId + " (" + user.userId + ")");
             const groupMember = await this.vrchat.GetGroupMember(groupId, user.vrchatUserId);
             this.sleep(500);
             const userInfo = await this.vrchat.GetUserInfo(user.vrchatUserId);
