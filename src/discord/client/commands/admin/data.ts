@@ -98,6 +98,7 @@ export class AdminDataViewCommand extends SlashCommand {
             await interaction.editReply({
                 embeds: [embed]
             });
+            return;
         }
 
         await interaction.editReply({

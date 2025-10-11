@@ -74,6 +74,7 @@ export class MyDataCommand extends SlashCommand {
             await interaction.editReply({
                 embeds: [embed]
             });
+            return;
         }
 
         await interaction.editReply({
