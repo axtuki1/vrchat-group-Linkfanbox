@@ -36,7 +36,7 @@ export class GroupRoleApplyTask extends Task {
             if (!user || !roles) {
                 return;
             }
-            if (config.settings.ignoreUsers && config.settings.ignoreUsers.includes(user.userId)) {
+            if (config.settings.ignoreUsers && config.settings.ignoreUsers[groupId] && config.settings.ignoreUsers[groupId].includes(user.vrchatUserId)) {
                 this.logger.info("[" + user.vrchatUserId + "] User is in ignore list. Skipping role application.");
                 return;
             }
