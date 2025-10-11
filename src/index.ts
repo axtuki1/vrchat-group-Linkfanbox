@@ -130,14 +130,20 @@ const Main = async () => {
                     if (pixivUserId != null) {
                         repo.getUserInfoByPixivId(pixivUserId).then(async (user) => {
                             if (user != null) {
-                                await repo.updateUser(
-                                    user.userId,
-                                    {
-                                        fanboxPlanId: planId,
-                                        planUpdateAt: new Date()
-                                    }
-                                );
-                                logger.info("Updated user: " + supporter.name + " (" + supporter.userId + ") -> " + planId);
+                                // Discord IDが登録されていない場合は更新する
+                                if (!user.discordUserId) {
+                                    await repo.updateUser(
+                                        user.userId,
+                                        {
+                                            fanboxPlanId: planId,
+                                            planUpdateAt: new Date()
+                                        }
+                                    );
+                                    logger.info("Updated user: " + supporter.name + " (" + supporter.userId + ") -> " + planId);
+                                } else {
+                                    // Discord IDが登録されている場合は更新しない
+                                    logger.info("Skiped user (Discord linked): " + supporter.name + " (" + supporter.userId + ") -> " + planId);
+                                }
                             } else {
                                 await repo.registerUser(
                                     "",
@@ -229,7 +235,7 @@ const Main = async () => {
     getDiscordRoleToSupportPlanTask.start();
 
     const allDiscordUserCheck = new AllDiscordUserCheck(bot, getDiscordRoleToSupportPlanTask);
-    
+
     allDiscordUserCheck.start();
 
     const exitProcess = async () => {
