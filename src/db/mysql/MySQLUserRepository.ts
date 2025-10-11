@@ -151,13 +151,8 @@ export class MySQLUserRepository extends MySQLBaseRepository implements UserRepo
             //     `UPDATE users_with_vrchat SET ${fields}, updateAt = NOW() WHERE userId = ?`,
             //     [...values, userId]
             // );
-            if ("vrchatDisplayName" in data) {
-                await this.connection.query(
-                    "UPDATE vrchat_users v JOIN users u ON v.userId = u.vrchatUserId SET v.userName = ?, v.updateAt = NOW() WHERE u.userId = ?",
-                    [data.vrchatDisplayName, userId]
-                );
-                delete data.vrchatDisplayName;
-            }
+            const vrchatDisplayName = data.vrchatDisplayName;
+            if (data.vrchatDisplayName) delete data.vrchatDisplayName;
 
             if (Object.keys(data).length > 0) {
                 const fields = Object.keys(data).map(key => `${key} = ?`).join(", ");
@@ -165,6 +160,14 @@ export class MySQLUserRepository extends MySQLBaseRepository implements UserRepo
                 await this.connection.query(
                     `UPDATE users SET ${fields}, updateAt = NOW() WHERE userId = ?`,
                     [...values, userId]
+                );
+            }
+
+            // vrchatIdが更新されないとvrchat_usersに当該IDのレコードがない場合に更新できないため、後ろで更新する
+            if (vrchatDisplayName) {
+                await this.connection.query(
+                    "UPDATE vrchat_users v JOIN users u ON v.userId = u.vrchatUserId SET v.userName = ?, v.updateAt = NOW() WHERE u.userId = ?",
+                    [data.vrchatDisplayName, userId]
                 );
             }
 
