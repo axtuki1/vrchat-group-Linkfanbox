@@ -1,15 +1,17 @@
 import { ChatInputCommandInteraction, EmbedBuilder, MessageFlags } from "discord.js";
-import { SlashCommand } from "../slashCommand";
-import { GetUserInfoService } from "../../../db/services/GetUserInfoService";
-import { UserRepositoryFactory } from "../../../db/factories/UserRepositoryFactory";
+import { UserRepositoryFactory } from "../../../../db/factories/UserRepositoryFactory";
+import { GetUserInfoService } from "../../../../db/services/GetUserInfoService";
+import { GetDiscordRoleToSupportPlanTask } from "../../../../task/GetDiscordRoleToSupportPlan";
+import { Logger } from "../../../../util/logger";
+import { SlashCommand } from "../../slashCommand";
+
 import * as fs from "fs";
-import { Logger } from "../../../util/logger";
-import { GetDiscordRoleToSupportPlanTask } from "../../../task/GetDiscordRoleToSupportPlan";
 const { parse } = require("jsonc-parser");
 const config = (() => {
     const json = fs.readFileSync("./config/config.json");
     return parse(json.toString());
 })();
+
 interface MyData {
     VRChat: {
         id?: string;
@@ -28,15 +30,34 @@ interface MyData {
 
 const wait = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
-export class MyDataCommand extends SlashCommand {
-    public name: string = "mydata";
-    public description: string = "Discordアカウントに紐づいている情報を確認します。";
+export class AdminDataViewCommand extends SlashCommand {
+    public name: string = "data";
+    public description: string = "登録情報を確認します。";
     public options = [
-
+        {
+            name: "user",
+            type: "user",
+            description: "確認したいユーザーを指定します。指定しない場合は自分の情報を表示します。",
+            required: false
+        }
     ];
-    public logger: Logger = new Logger("MyDataCommand");
+    public logger: Logger = new Logger("QueueViewCommand");
     private repo: GetUserInfoService = new GetUserInfoService(UserRepositoryFactory.create());
+
     public async execute(interaction: ChatInputCommandInteraction) {
+        if (!interaction.memberPermissions.has("Administrator")) {
+            await interaction.reply({
+                embeds: [
+                    this.getResponseTemplate()
+                        .setTitle("エラー")
+                        .setDescription("このコマンドを実行する権限がありません。")
+                        .setColor(0xFF0000)
+                ],
+                flags: MessageFlags.Ephemeral || MessageFlags.SuppressNotifications
+            });
+            return;
+        }
+
         await interaction.reply({
             embeds: [this.getPendingEmbed()],
             flags: MessageFlags.Ephemeral || MessageFlags.SuppressNotifications
@@ -46,7 +67,13 @@ export class MyDataCommand extends SlashCommand {
 
         const task = this.bot.getTask(GetDiscordRoleToSupportPlanTask);
 
-        const userData = await this.repo.getUserInfoByDiscordId(interaction.user.id);
+        let targetUserId = interaction.user.id;
+        const discordUser = interaction.options.getUser("user");
+        if (discordUser) {
+            targetUserId = discordUser.id;
+        }
+
+        const userData = await this.repo.getUserInfoByDiscordId(targetUserId);
         if (userData) {
             myData.active = true;
             if (userData.vrchatUserId) {
@@ -66,10 +93,7 @@ export class MyDataCommand extends SlashCommand {
         } else {
             const embed = this.getResponseTemplate()
                 .setTitle("エラー")
-                .setDescription(
-                    `まだ登録されていません。
-                    /register コマンドでVRChatアカウントを登録してください。`
-                )
+                .setDescription("指定されたユーザーは登録されていません。")
                 .setColor(0xFF0000);
             await interaction.editReply({
                 embeds: [embed]
@@ -92,14 +116,14 @@ export class MyDataCommand extends SlashCommand {
                 embed.addFields({
                     name: "VRChat",
                     value: `${data.VRChat.displayName}
-                    (${data.VRChat.id})`,
+                        (${data.VRChat.id})`,
                     inline: false
                 });
             } else {
                 embed.addFields({
                     name: "VRChat",
                     value: `※表示名取得待ち※
-                    (${data.VRChat.id})`,
+                        (${data.VRChat.id})`,
                     inline: false
                 });
             }

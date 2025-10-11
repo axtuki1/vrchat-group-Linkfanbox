@@ -50,7 +50,11 @@ export class DiscordBotClient {
                 command.processStartTimeStamp = new Date();
                 command.processStartPerformance = performance.now();
                 command.bot = this;
-                await command.execute(interaction);
+                if (command.isSubCommand(interaction)) {
+                    await command.executeSubCommand(interaction);
+                } else {
+                    await command.execute(interaction);
+                }
             } catch (error) {
                 const errId = rndstr({ length: 10 });
                 this.logger.error(`スラッシュコマンド実行時にエラーが発生しました。[ERRID: ${errId}]`);
@@ -127,7 +131,7 @@ export class DiscordBotClient {
     public registerTask(task: Task) {
         if (!this.tasks) this.tasks = [];
         const existingIndex = this.tasks.findIndex(([name, _]) => name === task.constructor.name);
-        if( existingIndex !== -1 ) {
+        if (existingIndex !== -1) {
             this.logger.warn(`Task ${task.constructor.name} is already registered. Skipping duplicate registration.`);
             return;
         }

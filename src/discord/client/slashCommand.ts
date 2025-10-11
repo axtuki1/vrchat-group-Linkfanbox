@@ -28,6 +28,24 @@ export abstract class SlashCommand {
 
     public abstract execute(interaction: ChatInputCommandInteraction);
 
+    public isSubCommand(interaction: ChatInputCommandInteraction): boolean {
+        return this.subCommands && this.subCommands.length > 0 && interaction.options.getSubcommand() !== null;
+    }
+
+    public async executeSubCommand(interaction: ChatInputCommandInteraction) {
+        if (!this.subCommandInstances || this.subCommandInstances.length === 0) {
+            throw new Error("No subcommands available.");
+        }
+        const subCommand = this.subCommandInstances.find(cmd => cmd.name === interaction.options.getSubcommand());
+        if (!subCommand) {
+            throw new Error(`Subcommand ${interaction.options.getSubcommand()} not found.`);
+        }
+        subCommand.bot = this.bot;
+        subCommand.processStartTimeStamp = new Date();
+        subCommand.processStartPerformance = performance.now();
+        return subCommand.execute(interaction);
+    }
+
     public getSlashCommand(): SlashCommandBuilder {
         const cmd = new SlashCommandBuilder().setName(this.name).setDescription(this.description);
         if (this.subCommands && this.subCommands.length > 0) {
@@ -129,6 +147,93 @@ export abstract class SlashCommand {
 
     public getSlashSubCommand(subCmd: SlashCommandSubcommandBuilder): SlashCommandSubcommandBuilder {
         subCmd.setName(this.name).setDescription(this.description);
+        if (this.options && this.options.length > 0) {
+            this.options.forEach(option => {
+                switch (option.type) {
+                    case "string":
+                        const stringOption = subCmd.addStringOption(opt => {
+                            opt.setName(option.name)
+                                .setDescription(option.description);
+                            if (option.required) opt.setRequired(option.required);
+                            if (option.choices) {
+                                option.choices.forEach((choice: { name: string; value: string | number }) => {
+                                    opt.addChoices({ name: choice.name, value: String(choice.value) });
+                                });
+                            }
+                            return opt;
+                        });
+                        break;
+                    case "integer":
+                        const intOption = subCmd.addIntegerOption(opt => {
+                            opt.setName(option.name)
+                                .setDescription(option.description);
+                            if (option.required) opt.setRequired(option.required);
+                            if (option.choices) {
+                                option.choices.forEach((choice: { name: string; value: string | number }) => {
+                                    opt.addChoices({ name: choice.name, value: Number(choice.value) });
+                                });
+                            }
+                            return opt;
+                        });
+                        break;
+                    case "boolean":
+                        subCmd.addBooleanOption(opt => {
+                            opt.setName(option.name)
+                                .setDescription(option.description);
+                            if (option.required) opt.setRequired(option.required);
+                            return opt;
+                        });
+                        break;
+                    case "user":
+                        subCmd.addUserOption(opt => {
+                            opt.setName(option.name)
+                                .setDescription(option.description);
+                            if (option.required) opt.setRequired(option.required);
+                            return opt;
+                        });
+                        break;
+                    case "channel":
+                        subCmd.addChannelOption(opt => {
+                            opt.setName(option.name)
+                                .setDescription(option.description);
+                            if (option.required) opt.setRequired(option.required);
+                            return opt;
+                        });
+                        break;
+                    case "role":
+                        subCmd.addRoleOption(opt => {
+                            opt.setName(option.name)
+                                .setDescription(option.description);
+                            if (option.required) opt.setRequired(option.required);
+                            return opt;
+                        });
+                        break;
+                    case "mentionable":
+                        subCmd.addMentionableOption(opt => {
+                            opt.setName(option.name)
+                                .setDescription(option.description);
+                            if (option.required) opt.setRequired(option.required);
+                            return opt;
+                        });
+                        break;
+                    case "number":
+                        subCmd.addNumberOption(opt => {
+                            opt.setName(option.name)
+                                .setDescription(option.description);
+                            if (option.required) opt.setRequired(option.required);
+                            if (option.choices) {
+                                option.choices.forEach((choice: { name: string; value: string | number }) => {
+                                    opt.addChoices({ name: choice.name, value: Number(choice.value) });
+                                });
+                            }
+                            return opt;
+                        });
+                        break;
+                    default:
+                        throw new Error(`Unknown option type: ${option.type}`);
+                }
+            });
+        }
         return subCmd;
     }
 

@@ -2,6 +2,8 @@ import { ChatInputCommandInteraction, MessageFlags } from "discord.js";
 import { SlashCommand } from "../../slashCommand";
 import { Logger } from "../../../../util/logger";
 import { QueueViewCommand } from "./queueView";
+import { AdminDataViewCommand } from "./data";
+import { QueueClearCommand } from "./queueClear";
 
 export class AdminCommand extends SlashCommand {
     public name: string = "admin";
@@ -9,7 +11,9 @@ export class AdminCommand extends SlashCommand {
     public options = [
     ];
     public subCommands: (new (...args: any[]) => SlashCommand)[] = [
-        // QueueViewCommand
+        AdminDataViewCommand,
+        QueueViewCommand,
+        QueueClearCommand
     ]
     public logger: Logger = new Logger("AdminCommand");
     public async execute(interaction: ChatInputCommandInteraction) {
