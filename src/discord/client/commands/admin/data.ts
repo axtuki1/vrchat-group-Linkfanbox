@@ -101,8 +101,12 @@ export class AdminDataViewCommand extends SlashCommand {
             return;
         }
 
+        const embed = this.getDataEmbeds(myData);
+
+        if(discordUser) embed.setTitle(`${discordUser.displayName}さんの登録情報`);
+
         await interaction.editReply({
-            embeds: [this.getDataEmbeds(myData)]
+            embeds: [embed]
         });
     }
 
