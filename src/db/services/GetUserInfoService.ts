@@ -237,4 +237,66 @@ export class GetUserInfoService {
             throw error;
         }
     }
+
+    async getUserSettings(userId: string): Promise<any> {
+        try {
+            const settings = await this.userRepository.getUserSettings(userId);
+
+            settings.eew_EnableIntensityOver3 = Boolean(parseInt(settings.eew_EnableIntensityOver3));
+
+            return settings;
+        } catch (error) {
+            console.error('Error fetching user settings:', error);
+            throw error;
+        }
+    }
+
+    async getUserSettingsByDiscordId(discordUserId: string): Promise<any> {
+        try {
+            const user = await this.userRepository.getUserByDiscordId(discordUserId);
+            if (!user) {
+                return null;
+            }
+            const settings = await this.getUserSettings(user.userId);
+            return settings;
+        } catch (error) {
+            console.error('Error fetching user settings by Discord ID:', error);
+            throw error;
+        }
+    }
+
+    async updateUserSettings(
+        userId: string,
+        settings: {
+            eew_EnableIntensityOver3?: boolean;
+        }
+    ): Promise<void> {
+        try {
+            await this.userRepository.updateUserSettings(userId, settings);
+            return;
+        } catch (error) {
+            console.error('Error updating user settings:', error);
+            throw error;
+        }
+    }
+
+    async updateUserSettingsByDiscordId(
+        discordUserId: string,
+        settings: {
+            eew_EnableIntensityOver3?: boolean;
+        }
+    ): Promise<void> {
+        try {
+            const user = await this.userRepository.getUserByDiscordId(discordUserId);
+            if (!user) {
+                throw new Error('User not found');
+            }
+            await this.updateUserSettings(user.userId, settings);
+            return;
+        } catch (error) {
+            console.error('Error updating user settings by Discord ID:', error);
+            throw error;
+        }
+    }
+
 }

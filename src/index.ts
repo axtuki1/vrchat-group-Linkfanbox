@@ -165,17 +165,17 @@ const Main = async () => {
             }
         };
 
-        const getFanboxRelationshipTask = new GetFanboxRelationshipTask(
-            fanbox,
-            config.settings.fanbox.coolTime,
-            supportersFunc,
-            (e) => {
-                logger.error("GetFanboxRelationshipTask Error: " + e);
-                discord.sendMessage("GetFanboxRelationshipTask Error: " + e);
-            }
-        );
+        // const getFanboxRelationshipTask = new GetFanboxRelationshipTask(
+        //     fanbox,
+        //     config.settings.fanbox.coolTime,
+        //     supportersFunc,
+        //     (e) => {
+        //         logger.error("GetFanboxRelationshipTask Error: " + e);
+        //         discord.sendMessage("GetFanboxRelationshipTask Error: " + e);
+        //     }
+        // );
 
-        getFanboxRelationshipTask.start();
+        // getFanboxRelationshipTask.start();
 
         const getVRChatLinkInfo = new GetVRChatLinkInfo(
             config.settings.spreadsheet.coolTime,
@@ -213,7 +213,7 @@ const Main = async () => {
 
         setTimeout(() => {
             checkApplyUsertask.start();
-        }, 1000 * 60 * 2);
+        }, 1000 * 60 * 0.5);
 
         setTimeout(() => {
             updateSupporterList.start();

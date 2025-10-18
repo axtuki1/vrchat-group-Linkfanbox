@@ -77,4 +77,15 @@ export interface UserRepositoryInterface {
      * @param fanboxPlanId ファンボックスのプランID
      */
     getPlanAvailableUsersByFanboxPlanId(fanboxPlanId: string): Promise<any>;
+    /**
+     * 指定のユーザーIDのユーザー設定を取得します。
+     * @param userId 
+     */
+    getUserSettings(userId: string): Promise<any>;
+    /**
+     * 指定のユーザーIDのユーザー設定を更新します。
+     * @param userId 
+     * @param settings 
+     */
+    updateUserSettings(userId: string, settings: any): Promise<any>;
 }

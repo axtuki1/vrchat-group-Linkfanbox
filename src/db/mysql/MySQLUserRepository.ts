@@ -208,4 +208,38 @@ export class MySQLUserRepository extends MySQLBaseRepository implements UserRepo
             console.error("Error:", error);
         }
     }
+
+    public async getUserSettings(userId: string): Promise<any> {
+        try {
+            const res = await this.connection.execute(
+                `SELECT * FROM user_settings WHERE userId = ?`,
+                [userId]
+            );
+            if (!res || res.length === 0) {
+                return null;
+            }
+            if (res[0][0].length === 0) {
+                return null;
+            }
+            return res[0][0];
+        } catch (error) {
+            console.error("Error:", error);
+        }
+    }
+
+    public async updateUserSettings(userId: string, settings: { [key: string]: any }): Promise<any> {
+        try {
+            const fields = Object.keys(settings)
+                .map(key => `${key} = ?`)
+                .join(", ");
+            const values = Object.values(settings);
+            const res = await this.connection.query(
+                `UPDATE user_settings SET ${fields} WHERE userId = ?`,
+                [...values, userId]
+            );
+            return res;
+        } catch (error) {
+            console.error("Error:", error);
+        }
+    }
 }

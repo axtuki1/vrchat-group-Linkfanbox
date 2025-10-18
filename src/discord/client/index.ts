@@ -7,11 +7,15 @@ const config = (() => {
 import { Client, Collection, Events, GatewayIntentBits, MessageFlags, REST, Routes } from "discord.js";
 import { SlashCommand } from "./slashCommand";
 import * as Commands from "./commands";
+import * as Modals from "./modals";
+import * as Buttons from "./buttons";
 // import * as Permissions from "./permissions";
 import { Logger } from "../../util/logger";
 import rndstr from "rndstr";
 import { PermissionData } from "./permission";
 import { Task } from "../../task";
+import { Modal } from "./modal";
+import { Button } from "./button";
 
 export class DiscordBotClient {
 
@@ -19,6 +23,10 @@ export class DiscordBotClient {
     public client: Client;
     private commands: SlashCommand[];
     private commandMap: Record<string, SlashCommand>;
+    private modals: Modal[];
+    private modalMap: Record<string, Modal>;
+    private buttons: Button[];
+    private buttonMap: Record<string, Button>;
     private permissions: {
         [key: string]: string[];
     };
@@ -37,6 +45,7 @@ export class DiscordBotClient {
             this.commands.map(cmd => [cmd.name, cmd])
         );
 
+        // コマンド処理
         this.client.on(Events.InteractionCreate, async interaction => {
             if (!interaction.isChatInputCommand()) return;
             const command = this.commandMap[interaction.commandName];
@@ -59,10 +68,73 @@ export class DiscordBotClient {
                 const errId = rndstr({ length: 10 });
                 this.logger.error(`スラッシュコマンド実行時にエラーが発生しました。[ERRID: ${errId}]`);
                 console.error(error);
+                console.error(JSON.stringify(error.rawError.errors, null, 1));
                 if (interaction.replied || interaction.deferred) {
                     await interaction.followUp({ content: `コマンド実行中にエラーが発生しました。ERRID: ${errId}`, flags: MessageFlags.Ephemeral });
                 } else {
                     await interaction.reply({ content: `コマンド実行中にエラーが発生しました。ERRID: ${errId}`, flags: MessageFlags.Ephemeral });
+                }
+            }
+        });
+
+        // モーダル登録
+        this.modals = Object.values(Modals).map((ModalClass: any) => new ModalClass());
+        this.modalMap = Object.fromEntries(
+            this.modals.map(modal => [modal.customId, modal])
+        );
+
+        // モーダル処理
+        this.client.on(Events.InteractionCreate, async interaction => {
+            if (!interaction.isModalSubmit()) return;
+            const modal = this.modalMap[interaction.customId];
+
+            if (!modal) {
+                this.logger.error(`不明なモーダル"${interaction.customId}"が呼ばれました。`);
+                return;
+            }
+
+            try {
+                await modal.process(interaction);
+            } catch (error) {
+                const errId = rndstr({ length: 10 });
+                this.logger.error(`モーダル処理中にエラーが発生しました。[ERRID: ${errId}]`);
+                console.error(error);
+                console.error(JSON.stringify(error.rawError.errors, null, 1));
+                if (interaction.replied || interaction.deferred) {
+                    await interaction.followUp({ content: `モーダル処理中にエラーが発生しました。ERRID: ${errId}`, flags: MessageFlags.Ephemeral });
+                } else {
+                    await interaction.reply({ content: `モーダル処理中にエラーが発生しました。ERRID: ${errId}`, flags: MessageFlags.Ephemeral });
+                }
+            }
+        });
+
+        // ボタン登録
+        this.buttons = Object.values(Buttons).map((ButtonClass: any) => new ButtonClass());
+        this.buttonMap = Object.fromEntries(
+            this.buttons.map(button => [button.customId, button])
+        );
+
+        // ボタン処理
+        this.client.on(Events.InteractionCreate, async interaction => {
+            if (!interaction.isButton()) return;
+            const button = this.buttonMap[interaction.customId];
+
+            if (!button) {
+                this.logger.error(`不明なボタン"${interaction.customId}"が呼ばれました。`);
+                return;
+            }
+
+            try {
+                await button.execute(interaction);
+            } catch (error) {
+                const errId = rndstr({ length: 10 });
+                this.logger.error(`ボタン処理中にエラーが発生しました。[ERRID: ${errId}]`);
+                console.error(error);
+                console.error(JSON.stringify(error.rawError.errors, null, 1));
+                if (interaction.replied || interaction.deferred) {
+                    await interaction.followUp({ content: `ボタン処理中にエラーが発生しました。ERRID: ${errId}`, flags: MessageFlags.Ephemeral });
+                } else {
+                    await interaction.reply({ content: `ボタン処理中にエラーが発生しました。ERRID: ${errId}`, flags: MessageFlags.Ephemeral });
                 }
             }
         });

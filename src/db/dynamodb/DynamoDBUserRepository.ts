@@ -5,8 +5,14 @@ import { GetCommand, GetCommandInput, PutCommand, QueryCommand, QueryCommandInpu
 import uuid from "ui7";
 
 export class DynamoDBUserRepository extends DynamoDBBaseRepository implements UserRepositoryInterface {
-
     // 一旦置き
+    getUserSettings(userId: string): Promise<any> {
+        throw new Error("Method not implemented.");
+    }
+    updateUserSettings(userId: string, settings: any): Promise<any> {
+        throw new Error("Method not implemented.");
+    }
+
     getAllUsers(): Promise<any> {
         throw new Error("Method not implemented.");
     }

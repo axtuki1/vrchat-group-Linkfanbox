@@ -98,6 +98,13 @@
             "<groupId>": [
                 "<userId>"
             ]
+        },
+        "userSettings": {
+            "roleId": {
+                "eew_EnableIntensityOver3": [
+                    "<roleId>"
+                ]
+            }
         }
     },
     "database": {
