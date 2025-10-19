@@ -17,7 +17,9 @@ export class SettingsEEWContainer extends Container {
             .addTextDisplayComponents(textDisplay => (
                 textDisplay.setContent(
                     "## 地震情報Beta\n" + 
-                    "★マークのついた設定は支援者限定機能です。"
+                    "★マークのついた設定は支援者限定機能です。\n" + 
+                    "ロールの付与、解除については定期実行のため、\n" + 
+                    "2日経過後も反映されていない場合はお問い合わせください。"
                 )
             ))
             .addSeparatorComponents((separator) => separator)
