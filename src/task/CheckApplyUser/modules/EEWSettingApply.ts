@@ -1,3 +1,4 @@
+import { User } from "../../../bean/User";
 import { UserRepositoryFactory } from "../../../db/factories/UserRepositoryFactory";
 import { GetUserInfoService } from "../../../db/services/GetUserInfoService";
 import { ApplyModule } from "../applyModule";
@@ -13,17 +14,21 @@ export class EEWSettingApply extends ApplyModule {
 
     constructor() {
         super();
-        this.roleIds = config.settings.userSettings.roleId.eew_EnableIntensityOver3;
+        this.roleIds = config.settings.eew_EnableIntensityOver3.roleId;
     }
 
     private repo: GetUserInfoService = new GetUserInfoService(UserRepositoryFactory.create());
 
-    public async checkAddRoles(userId: string, isSupporter: boolean, applyList: Record<string, boolean>): Promise<void> {
+    public async checkAddRoles(user: User, isSupporter: boolean, applyList: Record<string, boolean>): Promise<void> {
 
         // 支援者でなければ処理しない
         if (!isSupporter) return;
 
-        const userSettings = await this.repo.getUserSettings(userId);
+        // プランIDが含まれていない場合は処理しない
+        const availablePlanIds: string[] = config.settings.eew_EnableIntensityOver3.availablePlanId;
+        if (!availablePlanIds.includes(user.fanboxPlanId)) return;
+
+        const userSettings = await this.repo.getUserSettings(user.userId);
         for (const roleId of this.roleIds) {
             // ロールIDの頭が!の場合は反転
             if(roleId.startsWith("!")) {

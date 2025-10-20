@@ -119,7 +119,7 @@ export class CheckApplyUserTask extends Task {
                                 applyList[roleId] = false;
                             }
                         }
-                        await moduleInstance.checkAddRoles(user.userId, isSupporter, applyList);
+                        await moduleInstance.checkAddRoles(user, isSupporter, applyList);
                     }
 
                     this.logger.debug("Apply Role: " + userId + " groupId: " + groupId + " applyList: " + JSON.stringify(applyList));

@@ -105,6 +105,14 @@
                     "<roleId>"
                 ]
             }
+        },
+        "eew_EnableIntensityOver3": {
+            "roleId": [
+                "<roleId>"
+            ],
+            "availablePlanId": [
+                "<planId>"
+            ]
         }
     },
     "database": {
