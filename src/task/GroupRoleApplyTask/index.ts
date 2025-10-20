@@ -27,7 +27,7 @@ export class GroupRoleApplyTask extends Task {
     }
 
     public async execute(): Promise<void> {
-        if (this.queue.length == 0 || this.isProcessing) {
+        if (this.queue.length == 0 || this.isProcessing || !this.vrchat.isLogin) {
             return;
         }
         this.isProcessing = true;

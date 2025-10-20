@@ -106,11 +106,20 @@ const Main = async () => {
         logger.info("Login check: " + Msg.YesNo(isLogin));
 
         if (!isLogin) {
-            await vrchat.Login().then(async (result) => {
-                if (result.requiresTwoFactorAuth) {
-                    await vrchat.TwoFactorAuth();
+            const login = async () => {
+                try {
+                    await vrchat.Login().then(async (result) => {
+                        if (result.requiresTwoFactorAuth) {
+                            await vrchat.TwoFactorAuth();
+                        }
+                    });
+                } catch (e) {
+                    logger.error("Login Error: " + e);
+                    discord.sendMessage("VRChat Login Error: " + e);
+                    setTimeout(login, 1000 * 60 * 30); // 30分後に再試行
                 }
-            });
+            }
+            await login();
         }
 
         if (!vrchat.isLogin) {
