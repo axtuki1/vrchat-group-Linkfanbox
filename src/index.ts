@@ -1,3 +1,4 @@
+import 'source-map-support/register';
 import * as fs from "fs";
 import { Msg } from "./util/msg";
 import * as OTPAuth from "otpauth";

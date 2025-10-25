@@ -130,7 +130,7 @@ export class DiscordBotClient {
                 const errId = rndstr({ length: 10 });
                 this.logger.error(`ボタン処理中にエラーが発生しました。[ERRID: ${errId}]`);
                 console.error(error);
-                console.error(JSON.stringify(error.rawError.errors, null, 1));
+                console.error(JSON.stringify(error?.rawError?.errors, null, 1));
                 if (interaction.replied || interaction.deferred) {
                     await interaction.followUp({ content: `ボタン処理中にエラーが発生しました。ERRID: ${errId}`, flags: MessageFlags.Ephemeral });
                 } else {

@@ -14,6 +14,23 @@ export class SettingCommand extends SlashCommand {
     private repo: GetUserInfoService = new GetUserInfoService(UserRepositoryFactory.create());
 
     public async execute(interaction: ChatInputCommandInteraction) {
+
+        // ユーザー設定
+        const userSetting = await this.repo.getUserSettingsByDiscordId(interaction.user.id);
+    
+        if (userSetting == null) {
+            await interaction.reply({
+                embeds: [
+                    this.getResponseTemplate()
+                        .setColor(0xff0000)
+                        .setTitle("ユーザー情報が見つかりません")
+                        .setDescription("先に `/register` コマンドでVRChatアカウントと紐付けを行ってください。")
+                ],
+                flags: MessageFlags.Ephemeral
+            });
+            return;
+        }
+
         await interaction.reply({
             components: [new SettingsRootContainer().render()],
             flags: MessageFlags.Ephemeral | MessageFlags.IsComponentsV2
