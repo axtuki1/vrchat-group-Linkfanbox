@@ -4,11 +4,12 @@ const config = (() => {
     const json = fs.readFileSync("./config/config.json");
     return parse(json.toString());
 })();
-import { Client, Collection, Events, GatewayIntentBits, MessageFlags, REST, Routes } from "discord.js";
+import { Client, Collection, Events, GatewayIntentBits, MessageFlags, Partials, REST, Routes } from "discord.js";
 import { SlashCommand } from "./slashCommand";
 import * as Commands from "./commands";
 import * as Modals from "./modals";
 import * as Buttons from "./buttons";
+import * as MessageEvents from "./messageEvents"
 // import * as Permissions from "./permissions";
 import { Logger } from "../../util/logger";
 import rndstr from "rndstr";
@@ -16,6 +17,8 @@ import { PermissionData } from "./permission";
 import { Task } from "../../task";
 import { Modal } from "./modal";
 import { Button } from "./button";
+import { MessageEvent, MessageEventHandler } from "./messageEvent";
+import e = require("express");
 
 export class DiscordBotClient {
 
@@ -27,6 +30,7 @@ export class DiscordBotClient {
     private modalMap: Record<string, Modal>;
     private buttons: Button[];
     private buttonMap: Record<string, Button>;
+    private messageEvents: MessageEventHandler[];
     private permissions: {
         [key: string]: string[];
     };
@@ -37,7 +41,17 @@ export class DiscordBotClient {
 
         this.logger = new Logger("DiscordBotClient");
 
-        this.client = new Client({ intents: [GatewayIntentBits.Guilds] });
+        this.client = new Client({
+            intents: [
+                GatewayIntentBits.Guilds,
+                GatewayIntentBits.GuildMessages,
+                GatewayIntentBits.DirectMessages,
+            ],
+            partials: [
+                Partials.Channel,
+                Partials.Message
+            ]
+        });
 
         // スラッシュコマンドの登録
         this.commands = Object.values(Commands).map((Cmd: any) => new Cmd());
@@ -138,6 +152,38 @@ export class DiscordBotClient {
                 }
             }
         });
+
+        // メッセージイベント登録
+        this.messageEvents = Object.values(MessageEvents).map((MsgEventClass: any) => new MsgEventClass());
+        // 優先度でソート（数値が高いほど優先される）
+        this.messageEvents.sort((a, b) => b.priority - a.priority);
+
+        // メッセージ受信処理
+        this.client.on(Events.MessageCreate, async message => {
+            if (message.author.bot) return; // Botのメッセージは無視
+
+            const event = new MessageEvent(message);
+
+            for (const handler of this.messageEvents) {
+                try {
+                    if (!handler.processChannel.includes("GUILD")) {
+                        if (message.guild) continue;
+                    }
+                    if (!handler.processChannel.includes("DM")) {
+                        if (message.channel.type === 1) continue;
+                    }
+                    await handler.process(event);
+                    if(event.isCanneled) break;
+                } catch (error) {
+                    const errId = rndstr({ length: 10 });
+                    this.logger.error(`メッセージイベント処理中にエラーが発生しました。[ERRID: ${errId}]`);
+                    console.error(error);
+                    console.error(JSON.stringify(error?.rawError?.errors, null, 1));
+                }
+            }
+            
+        });
+
     }
 
     public async login(token: string) {
