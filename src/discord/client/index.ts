@@ -82,7 +82,7 @@ export class DiscordBotClient {
                 const errId = rndstr({ length: 10 });
                 this.logger.error(`スラッシュコマンド実行時にエラーが発生しました。[ERRID: ${errId}]`);
                 console.error(error);
-                console.error(JSON.stringify(error.rawError.errors, null, 1));
+                console.error(JSON.stringify(error?.rawError?.errors, null, 1));
                 if (interaction.replied || interaction.deferred) {
                     await interaction.followUp({ content: `コマンド実行中にエラーが発生しました。ERRID: ${errId}`, flags: MessageFlags.Ephemeral });
                 } else {
