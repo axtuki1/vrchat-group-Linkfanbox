@@ -92,7 +92,8 @@
             ],
             "roleIdForPlan": {
                 "<planId>": "<roleId>", // 
-            }
+            },
+            "messageEvents": true
         },
         "ignoreUsers": {
             "<groupId>": [

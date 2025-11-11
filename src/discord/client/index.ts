@@ -162,6 +162,8 @@ export class DiscordBotClient {
         this.client.on(Events.MessageCreate, async message => {
             if (message.author.bot) return; // Botのメッセージは無視
 
+            if(!config.settings.discord.messageEvents) return;
+
             const event = new MessageEvent(message);
 
             for (const handler of this.messageEvents) {
