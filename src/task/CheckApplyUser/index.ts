@@ -4,6 +4,8 @@ import { GetUserInfoService } from "../../db/services/GetUserInfoService";
 import { Logger } from "../../util/logger";
 import { GroupRoleApplyTask } from "../GroupRoleApplyTask";
 import * as fs from "fs";
+import { EEWSettingApply } from "./modules/EEWSettingApply";
+import { ApplyModule } from "./applyModule";
 const { parse } = require("jsonc-parser");
 const config = (() => {
     const json = fs.readFileSync("./config/config.json");
@@ -18,6 +20,11 @@ export class CheckApplyUserTask extends Task {
     private coolTime: number = 1440; // 24 hours
     private nextExecuteTime: Date;
     private repo: GetUserInfoService = null;
+
+    private applyModules: (new (...args: any[]) => ApplyModule)[] = [
+        EEWSettingApply
+    ];
+    private applyModuleInstances: ApplyModule[] = [];
 
     constructor(
         groupRoleApplyTask: GroupRoleApplyTask,
@@ -40,6 +47,11 @@ export class CheckApplyUserTask extends Task {
                 }
             }
         }
+
+        for (const ModuleClass of this.applyModules) {
+            const instance = new ModuleClass();
+            this.applyModuleInstances.push(instance);
+        }
     }
 
     public async execute(): Promise<void> {
@@ -49,7 +61,7 @@ export class CheckApplyUserTask extends Task {
         this.nextExecuteTime = new Date(new Date().getTime() + this.coolTime * 60 * 1000);
         // vrchatへ登録
         try {
-            const users = await this.repo.getRegisteredUsers();
+            const users = await this.repo.getAllUsers();
             if (users == null || users.length == 0) return;
             if (
                 config.settings.fanbox.plans == null ||
@@ -59,31 +71,58 @@ export class CheckApplyUserTask extends Task {
             for (const user of users) {
                 if (
                     user.vrchatUserId == null ||
-                    user.fanboxPlanId == null ||
-                    user.vrchatUserId == "" ||
-                    user.fanboxPlanId == ""
+                    user.vrchatUserId == ""
                 ) continue;
                 this.logger.debug("execute user: " + JSON.stringify(user));
                 const userId = user.vrchatUserId;
                 const planId = user.fanboxPlanId;
+                let isSupporter = false;
+                // 支援継続中か確認
+                const oneMonthAgo = new Date();
+                oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+                if (user.planUpdateAt >= oneMonthAgo) {
+                    isSupporter = true;
+                }
+
                 const groupIds = Object.keys(this.groupRoleList);
 
-                if (config.settings.fanbox.plans[planId] == null) continue;
+                // if (config.settings.fanbox.plans[planId] == null) continue;
 
                 for (const groupId of groupIds) {
                     const roleIds = this.groupRoleList[groupId];
                     if (roleIds == null || roleIds.length == 0) continue;
-                    const applyList = {};
+                    const applyList: Record<string, boolean> = {};
                     for (const roleId of roleIds) {
                         applyList[roleId] = false;
                         if (
-                            config.settings.fanbox.plans[planId][groupId].indexOf(roleId) !== -1 ||
-                            config.settings.fanbox.plans[planId][groupId].indexOf("*") !== -1
+                            planId &&
+                            isSupporter &&
+                            config.settings.fanbox.plans[planId] &&
+                            config.settings.fanbox.plans[planId][groupId] && (
+                                config.settings.fanbox.plans[planId][groupId].indexOf(roleId) !== -1 ||
+                                config.settings.fanbox.plans[planId][groupId].indexOf("*") !== -1
+                            )
                         ) {
                             applyList[roleId] = true;
                         }
                     }
-                    this.logger.info("Apply Role: " + userId + " groupId: " + groupId + " applyList: " + JSON.stringify(applyList));
+
+                    for (const moduleInstance of this.applyModuleInstances) {
+                        if (moduleInstance.roleIds == null || moduleInstance.roleIds.length == 0) continue;
+                        for (const roleId of moduleInstance.roleIds) {
+                            if (roleId.startsWith("!")) {
+                                const actualRoleId = roleId.substring(1);
+                                if (actualRoleId in applyList) continue;
+                                applyList[actualRoleId] = true;
+                            } else {
+                                if (roleId in applyList) continue;
+                                applyList[roleId] = false;
+                            }
+                        }
+                        await moduleInstance.checkAddRoles(user, isSupporter, applyList);
+                    }
+
+                    this.logger.debug("Apply Role: " + userId + " groupId: " + groupId + " applyList: " + JSON.stringify(applyList));
                     await this.groupRoleApplyTask.AddQueue(
                         user,
                         groupId,

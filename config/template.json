@@ -31,9 +31,15 @@
         "github": {
             // GitHubトークン
             "token": "<Tokentoken>"
+        },
+        "discord": {
+            "token": "<Tokentoken>",
+            "clientId": "",
+            "guildId": ""
         }
     },
     "settings": {
+        "useBotOnly": false,
         "spreadsheet": {
             // 処理完了位置を示すセル
             "completedRowCountCell": "I1",
@@ -73,6 +79,41 @@
         "planDisplayName": {
             // 各プランの表示名
             "<planId>": "<planDisplayName>"
+        },
+        "discord": {
+            // Discordの権限設定... (まだ使ってない)
+            "permissions": [
+                {
+                    "permissionId": "admin",
+                    "userIds": [
+                        ""
+                    ]
+                }
+            ],
+            "roleIdForPlan": {
+                "<planId>": "<roleId>", // 
+            },
+            "messageEvents": true
+        },
+        "ignoreUsers": {
+            "<groupId>": [
+                "<userId>"
+            ]
+        },
+        "userSettings": {
+            "roleId": {
+                "eew_EnableIntensityOver3": [
+                    "<roleId>"
+                ]
+            }
+        },
+        "eew_EnableIntensityOver3": {
+            "roleId": [
+                "<roleId>"
+            ],
+            "availablePlanId": [
+                "<planId>"
+            ]
         }
     },
     "database": {

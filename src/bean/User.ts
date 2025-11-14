@@ -1,8 +1,9 @@
 export class User {
     public userId: string;
     public vrchatDisplayName: string;
-    public vrchatUserId: string;
-    public pixivUserId: string;
+    public vrchatUserId?: string;
+    public pixivUserId?: string;
+    public discordUserId?: string;
     public createdAt: Date;
     public updatedAt: Date;
     public planUpdateAt: Date;
@@ -13,6 +14,7 @@ export class User {
         vrchatDisplayName: string,
         vrchatUserId: string,
         pixivUserId: string,
+        discordUserId: string,
         createdAt: Date,
         updatedAt: Date,
         planUpdateAt: Date,
@@ -22,6 +24,7 @@ export class User {
         this.vrchatDisplayName = vrchatDisplayName;
         this.vrchatUserId = vrchatUserId;
         this.pixivUserId = pixivUserId;
+        this.discordUserId = discordUserId;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.planUpdateAt = planUpdateAt;

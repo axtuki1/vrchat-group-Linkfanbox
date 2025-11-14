@@ -5,6 +5,12 @@ import { RoleQueueItem } from "./RoleQueueItem";
 import { User } from "../../bean/User";
 import { GetUserInfoService } from "../../db/services/GetUserInfoService";
 import { UserRepositoryFactory } from "../../db/factories/UserRepositoryFactory";
+import * as fs from "fs";
+const { parse } = require("jsonc-parser");
+const config = (() => {
+    const json = fs.readFileSync("./config/config.json");
+    return parse(json.toString());
+})();
 
 export class GroupRoleApplyTask extends Task {
 
@@ -21,7 +27,7 @@ export class GroupRoleApplyTask extends Task {
     }
 
     public async execute(): Promise<void> {
-        if (this.queue.length == 0 || this.isProcessing) {
+        if (this.queue.length == 0 || this.isProcessing || !this.vrchat.isLogin) {
             return;
         }
         this.isProcessing = true;
@@ -30,6 +36,11 @@ export class GroupRoleApplyTask extends Task {
             if (!user || !roles) {
                 return;
             }
+            if (config.settings.ignoreUsers && config.settings.ignoreUsers[groupId] && config.settings.ignoreUsers[groupId].includes(user.vrchatUserId)) {
+                this.logger.info("[" + user.vrchatUserId + "] User is in ignore list. Skipping role application.");
+                return;
+            }
+            this.logger.info("Processing user: " + user.vrchatUserId + " (" + user.userId + ")");
             const groupMember = await this.vrchat.GetGroupMember(groupId, user.vrchatUserId);
             this.sleep(500);
             const userInfo = await this.vrchat.GetUserInfo(user.vrchatUserId);

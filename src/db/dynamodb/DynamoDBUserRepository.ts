@@ -5,6 +5,29 @@ import { GetCommand, GetCommandInput, PutCommand, QueryCommand, QueryCommandInpu
 import uuid from "ui7";
 
 export class DynamoDBUserRepository extends DynamoDBBaseRepository implements UserRepositoryInterface {
+    // 一旦置き
+    getUserSettings(userId: string): Promise<any> {
+        throw new Error("Method not implemented.");
+    }
+    updateUserSettings(userId: string, settings: any): Promise<any> {
+        throw new Error("Method not implemented.");
+    }
+
+    getAllUsers(): Promise<any> {
+        throw new Error("Method not implemented.");
+    }
+    getAllUsersWithDiscordId(): Promise<any> {
+        throw new Error("Method not implemented.");
+    }
+    getAllUserWithVrchatId(): Promise<any> {
+        throw new Error("Method not implemented.");
+    }
+    getPlanAvailableUsers(): Promise<any> {
+        throw new Error("Method not implemented.");
+    }
+    getPlanAvailableUsersByFanboxPlanId(fanboxPlanId: string): Promise<any> {
+        throw new Error("Method not implemented.");
+    }
 
     
     updateUser(userId: string, data: { vrchatDisplayName?: string; vrchatUserId?: string; pixivUserId?: string; fanboxPlanId?: string | null; }): Promise<any> {
@@ -88,6 +111,29 @@ export class DynamoDBUserRepository extends DynamoDBBaseRepository implements Us
         }
     }
 
+    async getUserByDiscordId(discordUserId: string): Promise<any> {
+        const params: QueryCommandInput = {
+            TableName: this.tableName,
+            IndexName: this.vrchatUserIdIndexName,
+            KeyConditionExpression: "discordUserId = :discordUserId",
+            ExpressionAttributeValues: {
+                ":discordUserId": discordUserId
+            }
+        };
+        try {
+            const data = await this.documentClient.send(
+                new QueryCommand(params)
+            )
+            if (data.Items && data.Items.length > 0) {
+                return data.Items[0];
+            } else {
+                return null;
+            }
+        } catch (error) {
+            console.error("Error:", error);
+        }
+    }
+
     async getRegisteredUsers(): Promise<any> {
         const params: ScanCommandInput = {
             TableName: this.tableName,
@@ -132,6 +178,7 @@ export class DynamoDBUserRepository extends DynamoDBBaseRepository implements Us
         vrchatDisplayName: string,
         vrchatUserId: string,
         pixivUserId: string,
+        discordUserId: string | null = null,
         fanboxPlanId: string | null = null
     ): Promise<any> {
 
@@ -140,6 +187,7 @@ export class DynamoDBUserRepository extends DynamoDBBaseRepository implements Us
             vrchatDisplayName,
             vrchatUserId,
             pixivUserId,
+            discordUserId,
             new Date(),
             new Date(),
             new Date(),
