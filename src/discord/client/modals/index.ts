@@ -1,1 +1,1 @@
-export * from "./eew";
+export * from "./registerVrchatUserModal";

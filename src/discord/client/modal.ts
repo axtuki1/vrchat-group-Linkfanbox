@@ -1,6 +1,7 @@
-import { ActionRowBuilder, ChatInputCommandInteraction, ModalActionRowComponentBuilder, ModalBuilder, ModalSubmitInteraction } from "discord.js";
+import { ActionRowBuilder, ChatInputCommandInteraction, ComponentBuilder, EmbedBuilder, LabelBuilder, ModalActionRowComponentBuilder, ModalBuilder, ModalSubmitInteraction, TextDisplayBuilder } from "discord.js";
+import { Interaction } from "./interaction";
 
-export abstract class Modal {
+export abstract class Modal extends Interaction {
     public abstract customId: string;
     public abstract title: string;
 
@@ -10,12 +11,16 @@ export abstract class Modal {
             .setTitle(this.title);
         const components = this.getComponents();
         components.forEach(c => {
-            modal.addComponents(c);
+            if (c instanceof LabelBuilder) {
+                modal.addLabelComponents(c);
+            } else if (c instanceof TextDisplayBuilder) {
+                modal.addTextDisplayComponents(c);
+            }
         });
         return modal;
     }
 
-    public abstract getComponents(): ActionRowBuilder<ModalActionRowComponentBuilder>[];
+    public abstract getComponents(): ComponentBuilder[];
 
     public abstract process(interaction: ModalSubmitInteraction): Promise<void>;
 
@@ -23,4 +28,5 @@ export abstract class Modal {
         const modal = this.getModal();
         await interaction.showModal(modal);
     }
+
 }

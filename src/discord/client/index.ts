@@ -108,12 +108,15 @@ export class DiscordBotClient {
             }
 
             try {
+                modal.bot = this;
+                modal.processStartTimeStamp = new Date();
+                modal.processStartPerformance = performance.now();
                 await modal.process(interaction);
             } catch (error) {
                 const errId = rndstr({ length: 10 });
                 this.logger.error(`モーダル処理中にエラーが発生しました。[ERRID: ${errId}]`);
                 console.error(error);
-                console.error(JSON.stringify(error.rawError.errors, null, 1));
+                console.error(JSON.stringify(error?.rawError?.errors, null, 1));
                 if (interaction.replied || interaction.deferred) {
                     await interaction.followUp({ content: `モーダル処理中にエラーが発生しました。ERRID: ${errId}`, flags: MessageFlags.Ephemeral });
                 } else {
@@ -139,6 +142,9 @@ export class DiscordBotClient {
             }
 
             try {
+                button.bot = this;
+                button.processStartTimeStamp = new Date();
+                button.processStartPerformance = performance.now();
                 await button.execute(interaction);
             } catch (error) {
                 const errId = rndstr({ length: 10 });

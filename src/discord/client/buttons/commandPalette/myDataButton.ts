@@ -1,42 +1,22 @@
-import { ChatInputCommandInteraction, EmbedBuilder, MessageFlags } from "discord.js";
-import { SlashCommand } from "../slashCommand";
-import { GetUserInfoService } from "../../../db/services/GetUserInfoService";
-import { UserRepositoryFactory } from "../../../db/factories/UserRepositoryFactory";
+import { ButtonInteraction, EmbedBuilder, MessageFlags } from "discord.js";
+import { Button } from "../../button";
+import { RegisterVRChatAccountModal } from "../../modals";
+import { MyData, MyDataCommand } from "../../commands/mydata";
+import { GetDiscordRoleToSupportPlanTask } from "../../../../task/GetDiscordRoleToSupportPlan";
+import { GetUserInfoService } from "../../../../db/services/GetUserInfoService";
+import { UserRepositoryFactory } from "../../../../db/factories/UserRepositoryFactory";
 import * as fs from "fs";
-import { Logger } from "../../../util/logger";
-import { GetDiscordRoleToSupportPlanTask } from "../../../task/GetDiscordRoleToSupportPlan";
 const { parse } = require("jsonc-parser");
 const config = (() => {
     const json = fs.readFileSync("./config/config.json");
     return parse(json.toString());
 })();
-export interface MyData {
-    VRChat: {
-        id?: string;
-        displayName?: string;
-    },
-    pixiv: {
-        id?: string;
-        plan?: string;
-        planName?: string;
-    },
-    updateAt: Date;
-    planUpdateAt: Date;
-    active: boolean;
-    queuePosition?: number;
-}
 
-const wait = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
-
-export class MyDataCommand extends SlashCommand {
-    public name: string = "mydata";
-    public description: string = "Discordアカウントに紐づいている情報を確認します。";
-    public options = [
-
-    ];
-    public logger: Logger = new Logger("MyDataCommand");
+export class CommandPaletteMyDataButton extends Button {
+    public customId: string = "cp_mydata_button";
+    public label: string = "確認";
     private repo: GetUserInfoService = new GetUserInfoService(UserRepositoryFactory.create());
-    public async execute(interaction: ChatInputCommandInteraction) {
+    public async execute(interaction: ButtonInteraction): Promise<void> {
         await interaction.reply({
             embeds: [this.getPendingEmbed()],
             flags: MessageFlags.Ephemeral || MessageFlags.SuppressNotifications
@@ -68,7 +48,7 @@ export class MyDataCommand extends SlashCommand {
                 .setTitle("エラー")
                 .setDescription(
                     `まだ登録されていません。
-                    /register コマンドでVRChatアカウントを登録してください。`
+                            /register コマンドでVRChatアカウントを登録してください。`
                 )
                 .setColor(0xFF0000);
             await interaction.editReply({
@@ -93,14 +73,14 @@ export class MyDataCommand extends SlashCommand {
                 embed.addFields({
                     name: "VRChat",
                     value: `${data.VRChat.displayName}
-                    (${data.VRChat.id})`,
+                        (${data.VRChat.id})`,
                     inline: false
                 });
             } else {
                 embed.addFields({
                     name: "VRChat",
                     value: `※表示名取得待ち※
-                    (${data.VRChat.id})`,
+                        (${data.VRChat.id})`,
                     inline: false
                 });
             }
