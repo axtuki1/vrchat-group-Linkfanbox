@@ -4,6 +4,7 @@ import { Logger } from "../../../../util/logger";
 import { QueueViewCommand } from "./queueView";
 import { AdminDataViewCommand } from "./data";
 import { QueueClearCommand } from "./queueClear";
+import { SendContainerCommand } from "./sendContainer";
 
 export class AdminCommand extends SlashCommand {
     public name: string = "admin";
@@ -13,7 +14,8 @@ export class AdminCommand extends SlashCommand {
     public subCommands: (new (...args: any[]) => SlashCommand)[] = [
         AdminDataViewCommand,
         QueueViewCommand,
-        QueueClearCommand
+        QueueClearCommand,
+        SendContainerCommand
     ]
     public logger: Logger = new Logger("AdminCommand");
     public async execute(interaction: ChatInputCommandInteraction) {

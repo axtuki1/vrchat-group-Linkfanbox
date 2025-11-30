@@ -2,6 +2,7 @@ import { ChatInputCommandInteraction, EmbedBuilder, SlashCommandBuilder, SlashCo
 import { DiscordBotClient } from ".";
 import { Logger } from "../../util/logger";
 import { Modal } from "./modal";
+import { Interaction } from "./interaction";
 
 export interface SlashCommandOption {
     name: string;
@@ -11,20 +12,18 @@ export interface SlashCommandOption {
     choices?: { name: string; value: string | number }[];
 }
 
-export abstract class SlashCommand {
+export abstract class SlashCommand extends Interaction {
 
     public abstract name: string;
     public abstract description: string;
     public abstract options?: any[];
-    public bot: DiscordBotClient;
     public subCommands: (new (...args: any[]) => SlashCommand)[];
     private subCommandInstances: SlashCommand[];
-    public processStartTimeStamp: Date;
-    public processStartPerformance: number;
     public abstract logger: Logger;
     public modals: (new (...args: any[]) => Modal)[];
 
     constructor(bot: DiscordBotClient) {
+        super();
         this.bot = bot;
     }
 
@@ -241,31 +240,6 @@ export abstract class SlashCommand {
 
     public getSubCommands(): SlashCommand[] {
         return this.subCommandInstances || [];
-    }
-
-    public getPendingEmbed(): EmbedBuilder {
-        const embed = new EmbedBuilder();
-        embed.setDescription("おまちください....");
-        embed.setColor(0xFF6347);
-        embed.setFooter({ text: `受領日時: ${this.processStartTimeStamp.toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' })}` });
-        return embed;
-    }
-
-    public getResponseTemplate(): EmbedBuilder {
-        const elapsed = performance.now() - this.processStartPerformance;
-        let timeText: string;
-
-        if (elapsed < 1000) {
-            // 1秒未満はミリ秒で表示
-            timeText = `${elapsed.toFixed(1)}ms`;
-        } else {
-            // 1秒以上は秒で表示
-            timeText = `${(elapsed / 1000).toFixed(2)}s`;
-        }
-
-        return new EmbedBuilder().setFooter({
-            text: `受領日時: ${this.processStartTimeStamp.toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' })} (${timeText})`
-        });
     }
 
 }
