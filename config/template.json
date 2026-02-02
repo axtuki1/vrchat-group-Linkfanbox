@@ -65,9 +65,14 @@
                         "<roleId>"
                     ]
                 }
+            },
+            "defaultRoleId": {
+                "<groupId>": [
+                    "<roleId>"
+                ]
             }
         },
-        "gist":{
+        "gist": {
             // Gist ID ※作成済のものを指定
             "gistId": ""
         },
@@ -111,6 +116,21 @@
             "roleId": [
                 "<roleId>"
             ],
+            "availablePlanId": [
+                "<planId>"
+            ]
+        },
+        "eew_CustomIntensity": {
+            "roleIds": {
+                "intensity_3": "",
+                "intensity_4": "",
+                "intensity_5_lower": "",
+                "intensity_5_upper": "",
+                "intensity_6_lower": "",
+                "intensity_6_upper": "",
+                "intensity_7": "",
+                "warning_only": ""
+            },
             "availablePlanId": [
                 "<planId>"
             ]

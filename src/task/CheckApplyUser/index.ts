@@ -6,6 +6,7 @@ import { GroupRoleApplyTask } from "../GroupRoleApplyTask";
 import * as fs from "fs";
 import { EEWSettingApply } from "./modules/EEWSettingApply";
 import { ApplyModule } from "./applyModule";
+import { EEWCustomSettingApply } from "./modules/EEWCustomSettingApply";
 const { parse } = require("jsonc-parser");
 const config = (() => {
     const json = fs.readFileSync("./config/config.json");
@@ -28,7 +29,8 @@ export class CheckApplyUserTask extends Task {
     private repo: GetUserInfoService = null;
 
     private applyModules: (new (...args: any[]) => ApplyModule)[] = [
-        EEWSettingApply
+        EEWSettingApply,
+        EEWCustomSettingApply
     ];
     private applyModuleInstances: ApplyModule[] = [];
 
@@ -48,6 +50,17 @@ export class CheckApplyUserTask extends Task {
             for (const plan of Object.keys(config.settings.fanbox.plans)) {
                 const roleIds = config.settings.fanbox.plans[plan][groupId];
                 for (const roleId of roleIds) {
+                    if (this.groupRoleList[groupId].indexOf(roleId) !== -1) continue;
+                    this.groupRoleList[groupId].push(roleId);
+                }
+            }
+            // デフォルトロールの追加
+            if (
+                config.settings.fanbox.defaultRoleId &&
+                config.settings.fanbox.defaultRoleId[groupId]
+            ) {
+                const defaultRoleIds = config.settings.fanbox.defaultRoleId[groupId];
+                for (const roleId of defaultRoleIds) {
                     if (this.groupRoleList[groupId].indexOf(roleId) !== -1) continue;
                     this.groupRoleList[groupId].push(roleId);
                 }
@@ -111,11 +124,19 @@ export class CheckApplyUserTask extends Task {
                         ) {
                             applyList[roleId] = true;
                         }
+                        if (
+                            !isSupporter &&
+                            config.settings.fanbox.defaultRoleId &&
+                            config.settings.fanbox.defaultRoleId[groupId] &&
+                            config.settings.fanbox.defaultRoleId[groupId].indexOf(roleId) !== -1
+                        ) {
+                            applyList[roleId] = true;
+                        }
                     }
 
                     for (const moduleInstance of this.applyModuleInstances) {
-                        if (moduleInstance.over3_roleIds == null || moduleInstance.over3_roleIds.length == 0) continue;
-                        for (const roleId of moduleInstance.over3_roleIds) {
+                        if (moduleInstance.roleIds == null || moduleInstance.roleIds.length == 0) continue;
+                        for (const roleId of moduleInstance.roleIds) {
                             if (roleId.startsWith("!")) {
                                 const actualRoleId = roleId.substring(1);
                                 if (actualRoleId in applyList) continue;

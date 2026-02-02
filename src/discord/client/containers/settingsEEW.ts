@@ -18,37 +18,33 @@ export class SettingsEEWContainer extends Container {
             ))
             .addTextDisplayComponents(textDisplay => (
                 textDisplay.setContent(
-                    "## 地震情報Beta\n" + 
-                    "★マークのついた設定は支援者限定機能です。\n" + 
-                    "ロールの付与、解除については定期実行のため、\n" + 
+                    "## 地震情報Beta\n" +
+                    "★マークのついた設定は支援者限定機能です。\n" +
+                    "ロールの付与、解除については定期実行のため、\n" +
                     "2日経過後も反映されていない場合はお問い合わせください。"
                 )
             ))
             .addSeparatorComponents((separator) => separator)
-        if(this.config.feature.EnableEEWNoticeIntensityCustom) {
+        if (this.config.feature.EnableEEWNoticeIntensityCustom) {
 
             const customSelect = new EEWChangeCustomIntensity(userSettings.eew_CustomIntensitySetting)
-                                    .getButtonComponent(new StringSelectMenuBuilder());
+                .getButtonComponent(new StringSelectMenuBuilder());
 
-            container.addSectionComponents((section) => (
-                section
-                    .addTextDisplayComponents((textDisplay) => (
-                        textDisplay.setContent("### ★通知震度の設定")
-                    ))
-                    .addTextDisplayComponents((textDisplay) => (
-                        textDisplay.setContent(
-                            "通知を行う震度を指定できます。\n" +
-                                "" + 
-                                `＞ __現在の設定: **${EEWCustomIntensityUtil.getLabelFromIntensityValue(userSettings.eew_CustomIntensitySetting)}**__`
-                        )
-                    ))
-                    .setButtonAccessory((button) => new EEWToggleIntensityOver3(userSettings.eew_EnableIntensityOver3).getButtonComponent(button))
+            container.addTextDisplayComponents((textDisplay) => (
+                textDisplay.setContent("### ★通知震度の設定")
             ))
-            .addActionRowComponents((actionRow) => (
-                actionRow
-                    .addComponents(customSelect)
+                .addTextDisplayComponents((textDisplay) => (
+                    textDisplay.setContent(
+                        "通知を行う震度を指定できます。\n" +
+                        "" +
+                        `＞ __現在の設定: **${EEWCustomIntensityUtil.getLabelFromIntensityValue(userSettings.eew_CustomIntensitySetting)}**__`
+                    )
+                ))
+                .addActionRowComponents((actionRow) => (
+                    actionRow
+                        .addComponents(customSelect)
                 )
-            );
+                );
         } else {
             container.addSectionComponents((section) => (
                 section

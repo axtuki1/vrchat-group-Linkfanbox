@@ -58,7 +58,7 @@ export class EEWChangeCustomIntensity extends SelectMenu {
                 default: this.currentSelected === "intensity_6_upper"
             },
             {
-                label: "震度7",
+                label: "震度7のみ",
                 description: "震度7のみ通知を受け取ります。",
                 value: "intensity_7",
                 default: this.currentSelected === "intensity_7"
@@ -108,7 +108,7 @@ export class EEWCustomIntensityUtil {
                 return "intensity_6_lower";
             case "震度6強以上":
                 return "intensity_6_upper";
-            case "震度7":
+            case "震度7のみ":
                 return "intensity_7";
             case "警報のみ":
                 return "warning_only";
