@@ -16,6 +16,11 @@ const SCOPES = [
     'https://www.googleapis.com/auth/drive.file',
 ];
 
+/**
+ * Googleフォームに入力されたVRChatリンク情報を取得してDBに登録するタスク。
+ * @deprecated 現在はDiscordのロール基準でリンクするので非推奨。
+ */
+
 export class GetVRChatLinkInfo extends Task {
 
     private logger: Logger = new Logger("GetFanboxRelationshipTask");

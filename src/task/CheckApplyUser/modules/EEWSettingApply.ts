@@ -10,11 +10,16 @@ const config = (() => {
 })();
 
 export class EEWSettingApply extends ApplyModule {
-    public roleIds: string[];
+
+    public over3_roleIds: string[];
+    public custom_roleIds: Record<string, string[]> = {};
+    private featureSwitch: boolean;
 
     constructor() {
         super();
-        this.roleIds = config.settings.eew_EnableIntensityOver3.roleId;
+        this.over3_roleIds = config.settings.eew_EnableIntensityOver3.roleId;
+        this.custom_roleIds = config.settings.eew_CustomIntensity.roleIds;
+        this.featureSwitch = config.feature.EnableEEWNoticeIntensityCustom;
     }
 
     private repo: GetUserInfoService = new GetUserInfoService(UserRepositoryFactory.create());
@@ -29,20 +34,26 @@ export class EEWSettingApply extends ApplyModule {
         if (!availablePlanIds.includes(user.fanboxPlanId)) return;
 
         const userSettings = await this.repo.getUserSettings(user.userId);
-        for (const roleId of this.roleIds) {
-            // ロールIDの頭が!の場合は反転
-            if(roleId.startsWith("!")) {
-                const actualRoleId = roleId.substring(1);
-                if (userSettings.eew_EnableIntensityOver3) {
-                    applyList[actualRoleId] = false;
+        if (this.featureSwitch) {
+            // 震度カスタマイズ機能有効時
+
+        } else {
+            // 震度カスタマイズ機能無効時
+            for (const roleId of this.over3_roleIds) {
+                // ロールIDの頭が!の場合は反転
+                if (roleId.startsWith("!")) {
+                    const actualRoleId = roleId.substring(1);
+                    if (userSettings.eew_EnableIntensityOver3) {
+                        applyList[actualRoleId] = false;
+                    } else {
+                        applyList[actualRoleId] = true;
+                    }
                 } else {
-                    applyList[actualRoleId] = true;
-                }
-            } else {
-                if (userSettings.eew_EnableIntensityOver3) {
-                    applyList[roleId] = true;
-                } else {
-                    applyList[roleId] = false;
+                    if (userSettings.eew_EnableIntensityOver3) {
+                        applyList[roleId] = true;
+                    } else {
+                        applyList[roleId] = false;
+                    }
                 }
             }
         }

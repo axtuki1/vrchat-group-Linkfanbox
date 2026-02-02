@@ -116,6 +116,12 @@
             ]
         }
     },
+    "feature": {
+        // 通知震度のカスタマイズ機能を有効化するかどうか
+        // 有効にするとeew_EnableIntensityOver3の設定が無視され、ユーザ設定に従うようになる
+        // 通知震度の設定がなく、eew_EnableIntensityOver3の設定がある場合は震度3から通知として設定される
+        "EnableEEWNoticeIntensityCustom": false
+    },
     "database": {
         "use": "mysql",
         // "dynamoDB": {

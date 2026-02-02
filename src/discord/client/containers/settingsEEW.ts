@@ -1,12 +1,14 @@
-import { ButtonBuilder, ContainerBuilder } from "discord.js";
+import { ButtonBuilder, ContainerBuilder, StringSelectMenuBuilder, UserSelectMenuBuilder, UserSelectMenuComponent } from "discord.js";
 import { Container } from "../container";
 import { ToEEWSettingsButton, ToSettingRootButton } from "../buttons";
 import { EEWToggleIntensityOver3 } from "../buttons/EEWToggleIntensityOver3";
+import { EEWChangeCustomIntensity, EEWCustomIntensityUtil } from "../selectMenus/EEWChangeCustomIntensity";
 
 export class SettingsEEWContainer extends Container {
 
     public render(userSettings): ContainerBuilder {
-        return new ContainerBuilder()
+
+        const container = new ContainerBuilder()
             .setAccentColor(0x0099ff)
             .addActionRowComponents((actionRow) => (
                 actionRow
@@ -23,7 +25,32 @@ export class SettingsEEWContainer extends Container {
                 )
             ))
             .addSeparatorComponents((separator) => separator)
-            .addSectionComponents((section) => (
+        if(this.config.feature.EnableEEWNoticeIntensityCustom) {
+
+            const customSelect = new EEWChangeCustomIntensity(userSettings.eew_CustomIntensitySetting)
+                                    .getButtonComponent(new StringSelectMenuBuilder());
+
+            container.addSectionComponents((section) => (
+                section
+                    .addTextDisplayComponents((textDisplay) => (
+                        textDisplay.setContent("### ★通知震度の設定")
+                    ))
+                    .addTextDisplayComponents((textDisplay) => (
+                        textDisplay.setContent(
+                            "通知を行う震度を指定できます。\n" +
+                                "" + 
+                                `＞ __現在の設定: **${EEWCustomIntensityUtil.getLabelFromIntensityValue(userSettings.eew_CustomIntensitySetting)}**__`
+                        )
+                    ))
+                    .setButtonAccessory((button) => new EEWToggleIntensityOver3(userSettings.eew_EnableIntensityOver3).getButtonComponent(button))
+            ))
+            .addActionRowComponents((actionRow) => (
+                actionRow
+                    .addComponents(customSelect)
+                )
+            );
+        } else {
+            container.addSectionComponents((section) => (
                 section
                     .addTextDisplayComponents((textDisplay) => (
                         textDisplay.setContent("### ★震度3以上の通知")
@@ -36,6 +63,8 @@ export class SettingsEEWContainer extends Container {
                     ))
                     .setButtonAccessory((button) => new EEWToggleIntensityOver3(userSettings.eew_EnableIntensityOver3).getButtonComponent(button))
             ));
+        }
+        return container;
     }
 
 }

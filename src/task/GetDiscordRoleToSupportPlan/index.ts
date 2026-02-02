@@ -10,6 +10,10 @@ const config = (() => {
 })();
 import { Logger } from "../../util/logger";
 
+/**
+ * Discordのロールから加入プランを判定してDBを更新するタスク。
+ * ここではDBへの反映のみを行う。
+ */
 export class GetDiscordRoleToSupportPlanTask extends Task {
 
     private logger: Logger = new Logger("GetDiscordRoleToSupportPlanTask");

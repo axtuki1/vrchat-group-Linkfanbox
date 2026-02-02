@@ -12,6 +12,12 @@ const config = (() => {
     return parse(json.toString());
 })();
 
+/**
+ * VRChatへ登録するロールを判定するタスク。
+ * 本クラスではプランに紐づく固定ロール付与を実施。
+ * 各モジュールではユーザ設定などプランに紐づかないロール付与を行う。
+ */
+
 export class CheckApplyUserTask extends Task {
 
     private logger: Logger = new Logger("CheckApplyUserTask");
@@ -108,8 +114,8 @@ export class CheckApplyUserTask extends Task {
                     }
 
                     for (const moduleInstance of this.applyModuleInstances) {
-                        if (moduleInstance.roleIds == null || moduleInstance.roleIds.length == 0) continue;
-                        for (const roleId of moduleInstance.roleIds) {
+                        if (moduleInstance.over3_roleIds == null || moduleInstance.over3_roleIds.length == 0) continue;
+                        for (const roleId of moduleInstance.over3_roleIds) {
                             if (roleId.startsWith("!")) {
                                 const actualRoleId = roleId.substring(1);
                                 if (actualRoleId in applyList) continue;
