@@ -9,14 +9,14 @@ const config = (() => {
     return parse(json.toString());
 })();
 
-export class EEWSettingApply extends ApplyModule {
+export class EEWCustomSettingApply extends ApplyModule {
 
     public roleIds: string[];
     private featureSwitch: boolean;
 
     constructor() {
         super();
-        this.roleIds = config.settings.eew_EnableIntensityOver3.roleId;
+        this.roleIds = Object.values(config.settings.eew_CustomIntensity.roleIds).flat() as string[];
         this.featureSwitch = config.feature.EnableEEWNoticeIntensityCustom;
     }
 
@@ -28,39 +28,43 @@ export class EEWSettingApply extends ApplyModule {
         if (!isSupporter) return;
 
         // プランIDが含まれていない場合は処理しない
-        const availablePlanIds: string[] = config.settings.eew_EnableIntensityOver3.availablePlanId;
-
-        if (!availablePlanIds.includes(user.fanboxPlanId)) return;
+        const availablePlanIds: string[] = config.settings.eew_CustomIntensity.availablePlanId;
 
         const userSettings = await this.repo.getUserSettings(user.userId);
 
-        // 震度カスタマイズ機能無効時
-        for (const roleId of this.roleIds) {
-            if (!this.featureSwitch) {
+        if (!availablePlanIds.includes(user.fanboxPlanId)) return;
+
+        // 震度カスタマイズ機能有効時
+        const roleIdList = config.settings.eew_CustomIntensity.roleIds;
+        for(const id of Object.keys(roleIdList)) {
+            const roleId = roleIdList[id];
+            if (this.featureSwitch) {
                 // ロールIDの頭が!の場合は反転
                 if (roleId.startsWith("!")) {
                     const actualRoleId = roleId.substring(1);
-                    if (userSettings.eew_EnableIntensityOver3) {
+                    if (userSettings.eew_CustomIntensitySetting == id) {
                         applyList[actualRoleId] = false;
                     } else {
                         applyList[actualRoleId] = true;
                     }
                 } else {
-                    if (userSettings.eew_EnableIntensityOver3) {
+                    if (userSettings.eew_CustomIntensitySetting == id) {
                         applyList[roleId] = true;
                     } else {
                         applyList[roleId] = false;
                     }
                 }
             } else {
-                // 震度カスタマイズ機能有効時は全て外す
+                // 震度カスタマイズ機能無効時は全て外す
                 if (roleId.startsWith("!")) {
                     const actualRoleId = roleId.substring(1);
+                    if (actualRoleId in applyList) continue;
                     applyList[actualRoleId] = false;
                 } else {
+                    if (roleId in applyList) continue;
                     applyList[roleId] = false;
                 }
             }
-        }
+        };
     }
 }

@@ -12,6 +12,9 @@ const config = (() => {
     return parse(json.toString());
 })();
 
+/**
+ * VRChatのグループに対しロール付与/剥奪を行うタスク。
+ */
 export class GroupRoleApplyTask extends Task {
 
     private logger: Logger = new Logger("GroupRoleApplyTask");

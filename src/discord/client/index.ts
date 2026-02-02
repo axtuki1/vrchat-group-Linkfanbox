@@ -10,6 +10,7 @@ import * as Commands from "./commands";
 import * as Modals from "./modals";
 import * as Buttons from "./buttons";
 import * as MessageEvents from "./messageEvents"
+import * as SelectMenus from "./selectMenus";
 // import * as Permissions from "./permissions";
 import { Logger } from "../../util/logger";
 import rndstr from "rndstr";
@@ -19,6 +20,7 @@ import { Modal } from "./modal";
 import { Button } from "./button";
 import { MessageEvent, MessageEventHandler } from "./messageEvent";
 import e = require("express");
+import { SelectMenu } from "./selectMenu";
 
 export class DiscordBotClient {
 
@@ -30,6 +32,8 @@ export class DiscordBotClient {
     private modalMap: Record<string, Modal>;
     private buttons: Button[];
     private buttonMap: Record<string, Button>;
+    private selectMenus: SelectMenu[];
+    private selectMenuMap: Record<string, SelectMenu>;
     private messageEvents: MessageEventHandler[];
     private permissions: {
         [key: string]: string[];
@@ -155,6 +159,40 @@ export class DiscordBotClient {
                     await interaction.followUp({ content: `ボタン処理中にエラーが発生しました。ERRID: ${errId}`, flags: MessageFlags.Ephemeral });
                 } else {
                     await interaction.reply({ content: `ボタン処理中にエラーが発生しました。ERRID: ${errId}`, flags: MessageFlags.Ephemeral });
+                }
+            }
+        });
+
+        // セレクトメニュー登録
+        this.selectMenus = Object.values(SelectMenus).map((SelectMenuClass: any) => new SelectMenuClass());
+        this.selectMenuMap = Object.fromEntries(
+            this.selectMenus.map(selectMenu => [selectMenu.customId, selectMenu])
+        );
+
+        // セレクトメニュー処理
+        this.client.on(Events.InteractionCreate, async interaction => {
+            if (!interaction.isAnySelectMenu()) return;
+            const selectMenu = this.selectMenuMap[interaction.customId];
+
+            if (!selectMenu) {
+                this.logger.error(`不明なセレクトメニュー"${interaction.customId}"が呼ばれました。`);
+                return;
+            }
+
+            try {
+                selectMenu.bot = this;
+                selectMenu.processStartTimeStamp = new Date();
+                selectMenu.processStartPerformance = performance.now();
+                await selectMenu.execute(interaction);
+            } catch (error) {
+                const errId = rndstr({ length: 10 });
+                this.logger.error(`セレクトメニュー処理中にエラーが発生しました。[ERRID: ${errId}]`);
+                console.error(error);
+                console.error(JSON.stringify(error?.rawError?.errors, null, 1));
+                if (interaction.replied || interaction.deferred) {
+                    await interaction.followUp({ content: `セレクトメニュー処理中にエラーが発生しました。ERRID: ${errId}`, flags: MessageFlags.Ephemeral });
+                } else {
+                    await interaction.reply({ content: `セレクトメニュー処理中にエラーが発生しました。ERRID: ${errId}`, flags: MessageFlags.Ephemeral });
                 }
             }
         });

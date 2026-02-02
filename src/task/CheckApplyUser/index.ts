@@ -6,11 +6,18 @@ import { GroupRoleApplyTask } from "../GroupRoleApplyTask";
 import * as fs from "fs";
 import { EEWSettingApply } from "./modules/EEWSettingApply";
 import { ApplyModule } from "./applyModule";
+import { EEWCustomSettingApply } from "./modules/EEWCustomSettingApply";
 const { parse } = require("jsonc-parser");
 const config = (() => {
     const json = fs.readFileSync("./config/config.json");
     return parse(json.toString());
 })();
+
+/**
+ * VRChatへ登録するロールを判定するタスク。
+ * 本クラスではプランに紐づく固定ロール付与を実施。
+ * 各モジュールではユーザ設定などプランに紐づかないロール付与を行う。
+ */
 
 export class CheckApplyUserTask extends Task {
 
@@ -22,7 +29,8 @@ export class CheckApplyUserTask extends Task {
     private repo: GetUserInfoService = null;
 
     private applyModules: (new (...args: any[]) => ApplyModule)[] = [
-        EEWSettingApply
+        EEWSettingApply,
+        EEWCustomSettingApply
     ];
     private applyModuleInstances: ApplyModule[] = [];
 
@@ -42,6 +50,17 @@ export class CheckApplyUserTask extends Task {
             for (const plan of Object.keys(config.settings.fanbox.plans)) {
                 const roleIds = config.settings.fanbox.plans[plan][groupId];
                 for (const roleId of roleIds) {
+                    if (this.groupRoleList[groupId].indexOf(roleId) !== -1) continue;
+                    this.groupRoleList[groupId].push(roleId);
+                }
+            }
+            // デフォルトロールの追加
+            if (
+                config.settings.fanbox.defaultRoleId &&
+                config.settings.fanbox.defaultRoleId[groupId]
+            ) {
+                const defaultRoleIds = config.settings.fanbox.defaultRoleId[groupId];
+                for (const roleId of defaultRoleIds) {
                     if (this.groupRoleList[groupId].indexOf(roleId) !== -1) continue;
                     this.groupRoleList[groupId].push(roleId);
                 }
@@ -102,6 +121,14 @@ export class CheckApplyUserTask extends Task {
                                 config.settings.fanbox.plans[planId][groupId].indexOf(roleId) !== -1 ||
                                 config.settings.fanbox.plans[planId][groupId].indexOf("*") !== -1
                             )
+                        ) {
+                            applyList[roleId] = true;
+                        }
+                        if (
+                            !isSupporter &&
+                            config.settings.fanbox.defaultRoleId &&
+                            config.settings.fanbox.defaultRoleId[groupId] &&
+                            config.settings.fanbox.defaultRoleId[groupId].indexOf(roleId) !== -1
                         ) {
                             applyList[roleId] = true;
                         }

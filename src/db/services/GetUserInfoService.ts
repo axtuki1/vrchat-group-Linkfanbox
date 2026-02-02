@@ -269,6 +269,7 @@ export class GetUserInfoService {
         userId: string,
         settings: {
             eew_EnableIntensityOver3?: boolean;
+            eew_CustomIntensitySetting?: string;
         }
     ): Promise<void> {
         try {
@@ -284,6 +285,7 @@ export class GetUserInfoService {
         discordUserId: string,
         settings: {
             eew_EnableIntensityOver3?: boolean;
+            eew_CustomIntensitySetting?: string;
         }
     ): Promise<void> {
         try {

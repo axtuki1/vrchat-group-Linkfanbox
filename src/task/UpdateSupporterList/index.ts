@@ -9,6 +9,9 @@ const config = (() => {
     return parse(json.toString());
 })();
 
+/**
+ * GitHub Gistに支援者リストを登録するタスク。
+ */
 export class UpdateSupporterListTask extends Task {
 
     private logger: Logger = new Logger("UpdateSupporterListTask");

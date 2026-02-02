@@ -2,6 +2,9 @@ import { Task } from "..";
 import { FANBOX } from "../../fanbox";
 import { Logger } from "../../util/logger";
 
+/**
+ * 定期的にFANBOXの支援者リストを取得し処理を呼び出すタスク。
+ */
 export class GetFanboxRelationshipTask extends Task {
 
     private fanbox: FANBOX
