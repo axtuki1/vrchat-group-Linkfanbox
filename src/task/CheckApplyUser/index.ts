@@ -99,7 +99,7 @@ export class CheckApplyUserTask extends Task {
                 // 支援継続中か確認
                 const oneMonthAgo = new Date();
                 oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
-                if (user.planUpdateAt >= oneMonthAgo) {
+                if (user.fanboxPlanId != null && user.planUpdateAt >= oneMonthAgo) {
                     isSupporter = true;
                 }
 
