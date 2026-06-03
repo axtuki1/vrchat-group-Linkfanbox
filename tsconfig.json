@@ -1,8 +1,12 @@
 {
     "compilerOptions": {
-        "target":"ES2020",
+        "target": "ES2020",
         "sourceMap": true,
         "module": "CommonJS",
-        "outDir": "./build/"
+        "rootDir": "./src",
+        "outDir": "../build/",
+        "strictNullChecks": false,
+        "noImplicitAny": false,
+        "useUnknownInCatchVariables": false
     }
 }
