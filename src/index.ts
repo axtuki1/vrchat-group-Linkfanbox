@@ -187,15 +187,15 @@ const Main = async () => {
 
         // getFanboxRelationshipTask.start();
 
-        const getVRChatLinkInfo = new GetVRChatLinkInfo(
-            config.settings.spreadsheet.coolTime,
-            (e) => {
-                logger.error("GetVRChatLinkInfo Error: " + e);
-                discord.sendMessage("GroupRoleApplyTask Error: " + e);
-            }
-        );
+        // const getVRChatLinkInfo = new GetVRChatLinkInfo(
+        //     config.settings.spreadsheet.coolTime,
+        //     (e) => {
+        //         logger.error("GetVRChatLinkInfo Error: " + e);
+        //         discord.sendMessage("GroupRoleApplyTask Error: " + e);
+        //     }
+        // );
 
-        getVRChatLinkInfo.start();
+        // getVRChatLinkInfo.start();
 
         const groupRoleApplyTask = new GroupRoleApplyTask(
             vrchat,
